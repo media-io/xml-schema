@@ -1,0 +1,5 @@
+[workspace]
+members = [
+  "xml_schema",
+  "xml_schema_derive",
+]

@@ -1,0 +1,11 @@
+[package]
+name = "xml_schema"
+version = "0.0.1"
+description = "Structure generator from XSD source file"
+edition = "2018"
+
+[dependencies]
+xml_schema_derive = { version = "0.0.1", path = "../xml_schema_derive", optional = true }
+
+[dev-dependencies]
+xml_schema_derive = { version = "0.0.1", path = "../xml_schema_derive" }
