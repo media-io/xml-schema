@@ -1,8 +1,15 @@
 [package]
-name = "xml_schema"
+name = "xml-schema"
 version = "0.0.1"
 description = "Structure generator from XSD source file"
 edition = "2018"
+authors = ["Marc-Antoine Arnaud <maarnaud@media-io.com>"]
+keywords = ["XML", "Schema", "XSD"]
+license = "MIT"
+repository = "https://github.com/media-io/xml_schema_derive"
+homepage = "https://github.com/media-io/xml_schema_derive"
+documentation = "https://docs.rs/xml_schema"
+readme = "../README.md"
 
 [dependencies]
 xml_schema_derive = { version = "0.0.1", path = "../xml_schema_derive", optional = true }
