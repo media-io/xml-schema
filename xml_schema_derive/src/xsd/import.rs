@@ -1,6 +1,6 @@
-
-use yaserde::YaDeserialize;
+use log::debug;
 use std::io::prelude::*;
+use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
@@ -13,6 +13,6 @@ pub struct Import {
   pub id: Option<String>,
   #[yaserde(attribute)]
   pub namespace: Option<String>,
-  #[yaserde(rename="schemaLocation", attribute)]
+  #[yaserde(rename = "schemaLocation", attribute)]
   pub schema_location: Option<String>,
 }

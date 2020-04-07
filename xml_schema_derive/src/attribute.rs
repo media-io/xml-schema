@@ -6,6 +6,8 @@ use syn::Attribute;
 #[derive(Debug, PartialEq, Clone)]
 pub struct XmlSchemaAttribute {
   pub source: String,
+  pub target_prefix: Option<String>,
+  pub store_generated_code: Option<String>,
 }
 
 fn get_value(iter: &mut IntoIter) -> Option<String> {
@@ -25,6 +27,8 @@ fn get_value(iter: &mut IntoIter) -> Option<String> {
 impl XmlSchemaAttribute {
   pub fn parse(attrs: &[Attribute]) -> XmlSchemaAttribute {
     let mut source = None;
+    let mut store_generated_code = None;
+    let mut target_prefix = None;
 
     for attr in attrs.iter() {
       let mut attr_iter = attr.clone().tokens.into_iter();
@@ -38,6 +42,12 @@ impl XmlSchemaAttribute {
                 match ident.to_string().as_str() {
                   "source" => {
                     source = get_value(&mut attr_iter);
+                  }
+                  "store_generated_code" => {
+                    store_generated_code = get_value(&mut attr_iter);
+                  }
+                  "target_prefix" => {
+                    target_prefix = get_value(&mut attr_iter);
                   }
                   _ => {}
                 }
@@ -54,6 +64,8 @@ impl XmlSchemaAttribute {
 
     XmlSchemaAttribute {
       source: source.unwrap(),
+      store_generated_code,
+      target_prefix,
     }
   }
 }

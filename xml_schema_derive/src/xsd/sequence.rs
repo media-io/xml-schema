@@ -1,13 +1,22 @@
 use crate::xsd::element::Element;
-use yaserde::YaDeserialize;
+use log::debug;
+use proc_macro2::TokenStream;
 use std::io::prelude::*;
+use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(
-  prefix="xs",
-  namespace="xs: http://www.w3.org/2001/XMLSchema",
-)]
+#[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
 pub struct Sequence {
-  #[yaserde(rename="element")]
+  #[yaserde(rename = "element")]
   pub elements: Vec<Element>,
+}
+
+impl Sequence {
+  pub fn get_implementation(&self, prefix: &Option<String>) -> TokenStream {
+    self
+      .elements
+      .iter()
+      .map(|element| element.get_field_implementation(prefix))
+      .collect()
+  }
 }

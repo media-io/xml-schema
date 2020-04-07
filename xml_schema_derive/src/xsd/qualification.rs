@@ -1,12 +1,12 @@
-
-use yaserde::YaDeserialize;
+use log::debug;
 use std::io::prelude::*;
+use yaserde::YaDeserialize;
 
 #[derive(Clone, Debug, PartialEq, YaDeserialize)]
 pub enum Qualification {
-  #[yaserde(rename="qualified")]
+  #[yaserde(rename = "qualified")]
   Qualidified,
-  #[yaserde(rename="unqualified")]
+  #[yaserde(rename = "unqualified")]
   Unqualified,
 }
 

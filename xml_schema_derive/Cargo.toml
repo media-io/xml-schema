@@ -16,10 +16,11 @@ name = "xml_schema_derive"
 proc-macro = true
 
 [dependencies]
+heck = "0.3.1"
+Inflector = "0.11"
 log = "0.4"
 proc-macro2 = "1.0"
 quote = "1.0"
-Inflector = "0.11"
 syn = { version = "1.0", features = ["visit", "extra-traits"] }
 xml-rs = "0.8"
 yaserde_derive = { version = "0.3" }
