@@ -1,20 +1,15 @@
+mod complex_type;
+mod element;
+mod import;
+mod max_occurences;
+mod qualification;
+mod sequence;
 
+use proc_macro2::TokenStream;
+use yaserde::de::from_str;
 use yaserde::YaDeserialize;
+use std::fs;
 use std::io::prelude::*;
-
-#[derive(Clone, Debug, PartialEq, YaDeserialize)]
-pub enum Qualification {
-  #[yaserde(rename="qualified")]
-  Qualidified,
-  #[yaserde(rename="unqualified")]
-  Unqualified,
-}
-
-impl Default for Qualification {
-  fn default() -> Self {
-    Qualification::Unqualified
-  }
-}
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
@@ -26,67 +21,49 @@ pub struct Xsd {
   #[yaserde(rename="targetNamespace", attribute)]
   pub target_namespace: Option<String>,
   #[yaserde(rename="elementFormDefault", attribute)]
-  pub element_form_default: Qualification,
+  pub element_form_default: qualification::Qualification,
   #[yaserde(rename="attributeFormDefault", attribute)]
-  pub attribute_form_default: Qualification,
+  pub attribute_form_default: qualification::Qualification,
   #[yaserde(rename="import")]
-  pub imports: Vec<Import>,
+  pub imports: Vec<import::Import>,
   #[yaserde(rename="element")]
-  pub elements: Vec<Element>,
+  pub elements: Vec<element::Element>,
   #[yaserde(rename="complexType")]
-  pub complex_type: Vec<ComplexType>,
+  pub complex_type: Vec<complex_type::ComplexType>,
 }
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(
-  root="schema"
-  prefix="xs",
-  namespace="xs: http://www.w3.org/2001/XMLSchema",
-)]
-pub struct Import {
-  #[yaserde(attribute)]
-  pub id: Option<String>,
-  #[yaserde(attribute)]
-  pub namespace: Option<String>,
-  #[yaserde(rename="schemaLocation", attribute)]
-  pub schema_location: Option<String>,
-}
+impl Xsd {
+  pub fn new(content: &str) -> Result<Self, String> {
+    from_str(&content)
+  }
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(
-  prefix="xs",
-  namespace="xs: http://www.w3.org/2001/XMLSchema",
-)]
-pub struct ComplexType {
-  #[yaserde(attribute)]
-  pub name: String,
-  pub sequence: Sequence,
-}
+  pub fn new_from_file(source: &str) -> Result<Self, String> {
+    let path = std::env::current_dir().unwrap();
+    println!("The current directory is {}", path.display());
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(
-  prefix="xs",
-  namespace="xs: http://www.w3.org/2001/XMLSchema",
-)]
-pub struct Sequence {
-  #[yaserde(rename="element")]
-  pub elements: Vec<Element>,
-}
+    let content = fs::read_to_string(source).map_err(|e| e.to_string())?;
+    Xsd::new(&content)
+  }
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(
-  prefix="xs",
-  namespace="xs: http://www.w3.org/2001/XMLSchema",
-)]
-pub struct Element {
-  #[yaserde(attribute)]
-  pub name: String,
-  #[yaserde(rename="type", attribute)]
-  pub kind: String,
-  #[yaserde(rename="minOccurs", attribute)]
-  pub min_occurences: Option<u64>,
-  #[yaserde(rename="maxOccurs", attribute)]
-  pub max_occurences: Option<u64>,
-  #[yaserde(rename="complexType")]
-  pub complex_type: Vec<Sequence>,
+  pub fn get_implementation(&self) -> TokenStream {
+    let elements: TokenStream = self.elements
+      .iter()
+      .map(|element| {
+        element.get_implementation()
+      })
+      .collect();
+
+
+    let complex_types: TokenStream = self.complex_type
+      .iter()
+      .map(|complex_type| {
+        complex_type.get_implementation()
+      })
+      .collect();
+
+    quote!(
+      #complex_types
+      #elements
+    )
+  }
 }
