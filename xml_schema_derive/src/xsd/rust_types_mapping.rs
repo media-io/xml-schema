@@ -29,6 +29,12 @@ impl RustTypesMapping {
       "xs:language" => quote!(String),
       "xs:hexBinary" => quote!(String),
       "xs:dateTime" => quote!(String),
+      "xs:base64Binary" => quote!(String),
+      "base64Binary" => quote!(String),
+      "string" => quote!(String),
+      "integer" => quote!(i32),
+      "ID" => quote!(String),
+      "anyURI" => quote!(String),
       _ => {
         let v: Vec<&str> = kind.split(':').collect();
         let mut struct_name = (*v.last().unwrap()).to_string(); //.to_camel_case();

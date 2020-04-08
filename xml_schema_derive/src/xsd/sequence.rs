@@ -1,5 +1,5 @@
 use crate::xsd::element::Element;
-use log::debug;
+use log::info;
 use proc_macro2::TokenStream;
 use std::io::prelude::*;
 use yaserde::YaDeserialize;
@@ -13,10 +13,14 @@ pub struct Sequence {
 
 impl Sequence {
   pub fn get_implementation(&self, prefix: &Option<String>) -> TokenStream {
-    self
+    info!("Generate elements");
+    let code = self
       .elements
       .iter()
       .map(|element| element.get_field_implementation(prefix))
-      .collect()
+      .collect();
+
+    // println!("{}", code);
+    code
   }
 }

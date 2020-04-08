@@ -2,7 +2,7 @@ use crate::xsd::{
   complex_type::ComplexType, max_occurences::MaxOccurences, rust_types_mapping::RustTypesMapping,
 };
 use inflector::Inflector;
-use log::debug;
+use log::info;
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
 use syn::Ident;
@@ -15,6 +15,8 @@ pub struct Element {
   pub name: String,
   #[yaserde(rename = "type", attribute)]
   pub kind: String,
+  #[yaserde(rename = "ref", attribute)]
+  pub refers: String,
   #[yaserde(rename = "minOccurs", attribute)]
   pub min_occurences: Option<u64>,
   #[yaserde(rename = "maxOccurs", attribute)]
@@ -32,17 +34,33 @@ impl Element {
     let struct_name = Ident::new(&self.name, Span::call_site());
     let extern_type = self.get_identifier();
 
+    let fields =
+      if extern_type == "string" {
+        quote!(
+          #[yaserde(text)]
+          pub content: String,
+        )
+      } else {
+        quote!(
+          #[yaserde(flatten)]
+          pub content: #extern_type,
+        )
+      };
+
     quote! {
       #[derive(Clone, Debug, PartialEq, YaDeserialize, YaSerialize)]
       #namespace_definition
       pub struct #struct_name {
-        #[yaserde(flatten)]
-        pub content: #extern_type,
+        #fields
       }
     }
   }
 
   pub fn get_field_implementation(&self, prefix: &Option<String>) -> TokenStream {
+    info!("Generate element {:?}", self.name.to_snake_case());
+    if self.name.to_snake_case() == "" {
+      return quote!();
+    }
     let attribute_name = Ident::new(&self.name.to_snake_case(), Span::call_site());
     let yaserde_rename = &self.name;
 

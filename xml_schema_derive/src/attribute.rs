@@ -5,6 +5,7 @@ use syn::Attribute;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct XmlSchemaAttribute {
+  pub log_level: log::Level,
   pub source: String,
   pub target_prefix: Option<String>,
   pub store_generated_code: Option<String>,
@@ -26,6 +27,7 @@ fn get_value(iter: &mut IntoIter) -> Option<String> {
 
 impl XmlSchemaAttribute {
   pub fn parse(attrs: &[Attribute]) -> XmlSchemaAttribute {
+    let mut log_level = log::Level::Warn;
     let mut source = None;
     let mut store_generated_code = None;
     let mut target_prefix = None;
@@ -49,6 +51,19 @@ impl XmlSchemaAttribute {
                   "target_prefix" => {
                     target_prefix = get_value(&mut attr_iter);
                   }
+                  "log_level" => {
+                      if let Some(value) = get_value(&mut attr_iter) {
+                        log_level =
+                          match value.as_ref() {
+                            "trace" => log::Level::Trace,
+                            "debug" => log::Level::Debug,
+                            "info" => log::Level::Info,
+                            "warn" => log::Level::Warn,
+                            "error" => log::Level::Error,
+                            _ => log::Level::Warn,
+                          };
+                      }
+                  }
                   _ => {}
                 }
               }
@@ -63,6 +78,7 @@ impl XmlSchemaAttribute {
     }
 
     XmlSchemaAttribute {
+      log_level: log_level,
       source: source.unwrap(),
       store_generated_code,
       target_prefix,

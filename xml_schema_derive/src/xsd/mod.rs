@@ -13,7 +13,7 @@ mod simple_content;
 mod simple_type;
 mod union;
 
-use log::debug;
+use log::info;
 use proc_macro2::TokenStream;
 use std::fs;
 use std::io::prelude::*;
@@ -50,7 +50,7 @@ impl Xsd {
 
   pub fn new_from_file(source: &str) -> Result<Self, String> {
     let path = std::env::current_dir().unwrap();
-    debug!("The current directory is {}", path.display());
+    info!("The current directory is {}", path.display());
 
     let content = fs::read_to_string(source).map_err(|e| e.to_string())?;
     Xsd::new(&content)
@@ -68,18 +68,21 @@ impl Xsd {
         }
       };
 
+    info!("Generate elements");
     let elements: TokenStream = self
       .elements
       .iter()
       .map(|element| element.get_implementation(&namespace_definition, target_prefix))
       .collect();
 
+    info!("Generate simple types");
     let simple_types: TokenStream = self
       .simple_type
       .iter()
       .map(|simple_type| simple_type.get_implementation(&namespace_definition, target_prefix))
       .collect();
 
+    info!("Generate complex types");
     let complex_types: TokenStream = self
       .complex_type
       .iter()

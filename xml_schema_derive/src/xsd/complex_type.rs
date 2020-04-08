@@ -1,5 +1,5 @@
 use crate::xsd::{sequence::Sequence, simple_content::SimpleContent};
-use log::debug;
+use log::info;
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
 use syn::Ident;
@@ -23,12 +23,14 @@ impl ComplexType {
   ) -> TokenStream {
     let struct_name = Ident::new(&self.name, Span::call_site());
 
-    let elements = self
+    info!("Generate sequence");
+    let sequence = self
       .sequence
       .as_ref()
       .map(|sequence| sequence.get_implementation(prefix))
       .unwrap_or_else(|| quote!());
 
+    info!("Generate simple content");
     let simple_content = self
       .simple_content
       .as_ref()
@@ -39,7 +41,7 @@ impl ComplexType {
       #[derive(Clone, Debug, Default, PartialEq, YaDeserialize, YaSerialize)]
       #namespace_definition
       pub struct #struct_name {
-        #elements
+        #sequence
         #simple_content
       }
     }

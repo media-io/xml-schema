@@ -1,9 +1,14 @@
 use crate::attribute::XmlSchemaAttribute;
 use crate::xsd::Xsd;
+use log::info;
 use proc_macro2::TokenStream;
 
 pub fn expand_derive(ast: &syn::DeriveInput) -> Result<TokenStream, String> {
   let attributes = XmlSchemaAttribute::parse(&ast.attrs);
+  let _ = simple_logger::init_with_level(attributes.log_level);
+
+  info!("{:?}", attributes);
+
   let xsd = Xsd::new_from_file(&attributes.source)?;
   let generated = xsd.get_implementation(&attributes.target_prefix);
 
