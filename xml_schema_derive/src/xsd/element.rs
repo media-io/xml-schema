@@ -2,7 +2,7 @@ use crate::xsd::{
   complex_type::ComplexType, max_occurences::MaxOccurences, rust_types_mapping::RustTypesMapping,
 };
 use inflector::Inflector;
-use log::info;
+use log::{debug, info};
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
 use syn::Ident;
@@ -34,18 +34,17 @@ impl Element {
     let struct_name = Ident::new(&self.name, Span::call_site());
     let extern_type = self.get_identifier();
 
-    let fields =
-      if extern_type == "string" {
-        quote!(
-          #[yaserde(text)]
-          pub content: String,
-        )
-      } else {
-        quote!(
-          #[yaserde(flatten)]
-          pub content: #extern_type,
-        )
-      };
+    let fields = if extern_type == "string" {
+      quote!(
+        #[yaserde(text)]
+        pub content: String,
+      )
+    } else {
+      quote!(
+        #[yaserde(flatten)]
+        pub content: #extern_type,
+      )
+    };
 
     quote! {
       #[derive(Clone, Debug, PartialEq, YaDeserialize, YaSerialize)]

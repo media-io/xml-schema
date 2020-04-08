@@ -52,17 +52,16 @@ impl XmlSchemaAttribute {
                     target_prefix = get_value(&mut attr_iter);
                   }
                   "log_level" => {
-                      if let Some(value) = get_value(&mut attr_iter) {
-                        log_level =
-                          match value.as_ref() {
-                            "trace" => log::Level::Trace,
-                            "debug" => log::Level::Debug,
-                            "info" => log::Level::Info,
-                            "warn" => log::Level::Warn,
-                            "error" => log::Level::Error,
-                            _ => log::Level::Warn,
-                          };
-                      }
+                    if let Some(value) = get_value(&mut attr_iter) {
+                      log_level = match value.as_ref() {
+                        "trace" => log::Level::Trace,
+                        "debug" => log::Level::Debug,
+                        "info" => log::Level::Info,
+                        "warn" => log::Level::Warn,
+                        "error" => log::Level::Error,
+                        _ => log::Level::Warn,
+                      };
+                    }
                   }
                   _ => {}
                 }
@@ -78,7 +77,7 @@ impl XmlSchemaAttribute {
     }
 
     XmlSchemaAttribute {
-      log_level: log_level,
+      log_level,
       source: source.unwrap(),
       store_generated_code,
       target_prefix,

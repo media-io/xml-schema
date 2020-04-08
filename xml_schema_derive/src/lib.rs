@@ -1,5 +1,3 @@
-// #[macro_use]
-// extern crate log;
 #[macro_use]
 extern crate quote;
 #[macro_use]

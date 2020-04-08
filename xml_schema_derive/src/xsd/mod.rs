@@ -13,7 +13,7 @@ mod simple_content;
 mod simple_type;
 mod union;
 
-use log::info;
+use log::{debug, info};
 use proc_macro2::TokenStream;
 use std::fs;
 use std::io::prelude::*;

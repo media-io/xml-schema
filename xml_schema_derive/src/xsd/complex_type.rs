@@ -1,5 +1,5 @@
 use crate::xsd::{sequence::Sequence, simple_content::SimpleContent};
-use log::info;
+use log::{debug, info};
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
 use syn::Ident;
