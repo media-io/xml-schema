@@ -49,10 +49,19 @@ impl Xsd {
   }
 
   pub fn new_from_file(source: &str) -> Result<Self, String> {
-    let path = std::env::current_dir().unwrap();
-    info!("The current directory is {}", path.display());
+    let content = if source.starts_with("http://") || source.starts_with("https://") {
+      info!("Load HTTP schema {}", source);
+      reqwest::blocking::get(source)
+        .map_err(|e| e.to_string())?
+        .text()
+        .map_err(|e| e.to_string())?
+    } else {
+      let path = std::env::current_dir().unwrap();
+      info!("The current directory is {}", path.display());
 
-    let content = fs::read_to_string(source).map_err(|e| e.to_string())?;
+      fs::read_to_string(source).map_err(|e| e.to_string())?
+    };
+
     Xsd::new(&content)
   }
 
