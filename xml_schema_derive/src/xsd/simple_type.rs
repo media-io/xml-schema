@@ -1,5 +1,5 @@
 use crate::xsd::{list::List, restriction::Restriction, union::Union};
-// use heck::CamelCase;
+use heck::CamelCase;
 use log::debug;
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
@@ -22,8 +22,7 @@ impl SimpleType {
     namespace_definition: &TokenStream,
     _prefix: &Option<String>,
   ) -> TokenStream {
-    // let struct_name = Ident::new(&self.name.to_camel_case(), Span::call_site());
-    let struct_name = Ident::new(&self.name, Span::call_site());
+    let struct_name = Ident::new(&self.name.to_camel_case(), Span::call_site());
 
     quote!(
       #[derive(Clone, Debug, Default, PartialEq, YaDeserialize, YaSerialize)]

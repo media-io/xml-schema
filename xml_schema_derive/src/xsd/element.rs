@@ -1,7 +1,7 @@
 use crate::xsd::{
   complex_type::ComplexType, max_occurences::MaxOccurences, rust_types_mapping::RustTypesMapping,
 };
-use inflector::Inflector;
+use heck::{CamelCase, SnakeCase};
 use log::{debug, info};
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
@@ -74,15 +74,27 @@ impl Element {
   }
 
   pub fn get_field_implementation(&self, prefix: &Option<String>, multiple: bool) -> TokenStream {
-    info!("Generate element {:?}", self.name.to_snake_case());
-    if self.name.to_snake_case() == "" {
+    if self.name == "" {
       return quote!();
     }
 
+    if self.kind == "md:CompObjEntry-type" {
+      return quote!();
+    }
+
+    let name =
+      if self.name.to_lowercase() == "type" {
+        "Kind".to_string()
+      } else {
+        self.name.to_snake_case().clone()
+      };
+
+    info!("Generate element {:?}", name);
+
     let name = if multiple {
-      format!("{}s", self.name.to_snake_case())
+      format!("{}s", name)
     } else {
-      self.name.to_snake_case()
+      name
     };
 
     let attribute_name = Ident::new(&name, Span::call_site());
@@ -93,7 +105,10 @@ impl Element {
     } else if self.complex_type.first().unwrap().sequence.is_some() {
       let list_wrapper = Ident::new(&self.name, Span::call_site());
       quote!(#list_wrapper)
+    } else if self.complex_type.first().unwrap().simple_content.is_some() {
+      quote!(String)
     } else {
+      println!("UNIMPLEMENTED {:?}", self);
       unimplemented!()
     };
 
@@ -121,7 +136,7 @@ impl Element {
   }
 
   pub fn get_ident_identifier(&self) -> Ident {
-    let identifier = self.get_identifier();
+    let identifier = self.get_identifier().to_camel_case();
     Ident::new(&identifier, Span::call_site())
   }
 }

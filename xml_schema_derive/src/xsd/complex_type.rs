@@ -1,4 +1,5 @@
 use crate::xsd::{sequence::Sequence, simple_content::SimpleContent};
+use heck::CamelCase;
 use log::{debug, info};
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
@@ -21,7 +22,7 @@ impl ComplexType {
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
   ) -> TokenStream {
-    let struct_name = Ident::new(&self.name, Span::call_site());
+    let struct_name = Ident::new(&self.name.to_camel_case(), Span::call_site());
 
     info!("Generate sequence");
     let sequence = self

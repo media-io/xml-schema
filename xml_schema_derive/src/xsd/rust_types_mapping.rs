@@ -1,4 +1,4 @@
-// use heck::CamelCase;
+use heck::CamelCase;
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 
@@ -31,17 +31,23 @@ impl RustTypesMapping {
       "xs:dateTime" => quote!(String),
       "xs:base64Binary" => quote!(String),
       "base64Binary" => quote!(String),
+      "xs:duration" => quote!(String),
+      "xs:gYear" => quote!(u16),
       "string" => quote!(String),
       "integer" => quote!(i32),
       "ID" => quote!(String),
       "anyURI" => quote!(String),
       _ => {
         let v: Vec<&str> = kind.split(':').collect();
-        let mut struct_name = (*v.last().unwrap()).to_string(); //.to_camel_case();
+        let struct_name = (*v.last().unwrap()).to_string();
 
-        if struct_name == "" {
-          struct_name = "String".to_string();
-        }
+        let struct_name =
+          if struct_name == "" {
+            "String".to_string()
+          } else {
+            struct_name.to_camel_case()
+          };
+
         let struct_name = Ident::new(&struct_name, Span::call_site());
 
         quote!(#struct_name)

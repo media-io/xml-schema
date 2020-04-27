@@ -32,7 +32,14 @@ impl Default for Required {
 
 impl Attribute {
   pub fn get_implementation(&self) -> TokenStream {
-    let field_name = Ident::new(&self.name, Span::call_site());
+    let name =
+      if self.name == "type" {
+        "kind".to_string()
+      } else {
+        self.name.clone()
+      };
+
+    let field_name = Ident::new(&name, Span::call_site());
     let rust_type = RustTypesMapping::get(&self.kind);
 
     let rust_type = if self.required == Required::Optional {
