@@ -37,6 +37,18 @@ impl ComplexType {
       .map(|simple_content| simple_content.get_implementation())
       .unwrap_or_else(|| quote!());
 
+    let namespace_definition = if self.name == "AssetType" {
+      quote!(#[yaserde(root= "Asset", prefix = "am", namespace="am: http://www.smpte-ra.org/schemas/429-9/2007/AM")])
+    } else {
+      namespace_definition.clone()
+    };
+
+    let sub_types_implementation = self
+      .sequence
+      .as_ref()
+      .map(|sequence| sequence.get_sub_types_implementation(&namespace_definition, prefix))
+      .unwrap_or_else(|| quote!());
+
     quote! {
       #[derive(Clone, Debug, Default, PartialEq, YaDeserialize, YaSerialize)]
       #namespace_definition
@@ -44,6 +56,16 @@ impl ComplexType {
         #sequence
         #simple_content
       }
+
+      #sub_types_implementation
     }
+  }
+
+  pub fn get_field_implementation(&self, prefix: &Option<String>) -> TokenStream {
+    self
+      .sequence
+      .as_ref()
+      .map(|sequence| sequence.get_field_implementation(prefix))
+      .unwrap_or_else(|| quote!())
   }
 }

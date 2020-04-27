@@ -29,25 +29,31 @@ impl Element {
   pub fn get_implementation(
     &self,
     namespace_definition: &TokenStream,
-    _prefix: &Option<String>,
+    prefix: &Option<String>,
   ) -> TokenStream {
     let struct_name = Ident::new(&self.name, Span::call_site());
-    let extern_type = self.get_identifier();
 
-    let fields = if extern_type == "string" {
-      quote!(
+    let fields = match self.get_identifier().as_ref() {
+      "string" => quote!(
         #[yaserde(text)]
         pub content: String,
-      )
-    } else {
-      quote!(
-        #[yaserde(flatten)]
-        pub content: #extern_type,
-      )
+      ),
+      "" => self
+        .complex_type
+        .iter()
+        .map(|complex_type| complex_type.get_field_implementation(prefix))
+        .collect(),
+      _ => {
+        let extern_type = self.get_ident_identifier();
+        quote!(
+          #[yaserde(flatten)]
+          pub content: #extern_type,
+        )
+      }
     };
 
     quote! {
-      #[derive(Clone, Debug, PartialEq, YaDeserialize, YaSerialize)]
+      #[derive(Clone, Debug, Default, PartialEq, YaDeserialize, YaSerialize)]
       #namespace_definition
       pub struct #struct_name {
         #fields
@@ -55,22 +61,46 @@ impl Element {
     }
   }
 
-  pub fn get_field_implementation(&self, prefix: &Option<String>) -> TokenStream {
+  pub fn get_subtypes_implementation(
+    &self,
+    namespace_definition: &TokenStream,
+    prefix: &Option<String>,
+  ) -> TokenStream {
+    if self.complex_type.is_empty() {
+      return quote!();
+    }
+
+    self.get_implementation(namespace_definition, prefix)
+  }
+
+  pub fn get_field_implementation(&self, prefix: &Option<String>, multiple: bool) -> TokenStream {
     info!("Generate element {:?}", self.name.to_snake_case());
     if self.name.to_snake_case() == "" {
       return quote!();
     }
-    let attribute_name = Ident::new(&self.name.to_snake_case(), Span::call_site());
+
+    let name = if multiple {
+      format!("{}s", self.name.to_snake_case())
+    } else {
+      self.name.to_snake_case()
+    };
+
+    let attribute_name = Ident::new(&name, Span::call_site());
     let yaserde_rename = &self.name;
 
     let rust_type = if self.complex_type.is_empty() {
       RustTypesMapping::get(&self.kind)
-    } else if let Some(sequence) = &self.complex_type.first().unwrap().sequence {
-      let element = sequence.elements.first().unwrap();
-      let list_type = element.get_identifier();
-      quote!(Vec<#list_type>)
+    } else if self.complex_type.first().unwrap().sequence.is_some() {
+      let list_wrapper = Ident::new(&self.name, Span::call_site());
+      quote!(#list_wrapper)
     } else {
       unimplemented!()
+    };
+
+    let rust_type = if multiple {
+      quote!(Vec<#rust_type>)
+    } else {
+      rust_type
     };
 
     let prefix_attribute = if let Some(prefix) = prefix {
@@ -85,8 +115,13 @@ impl Element {
     }
   }
 
-  pub fn get_identifier(&self) -> Ident {
-    let complex_type_list: Vec<&str> = self.kind.split(':').collect();
-    Ident::new(&complex_type_list.last().unwrap(), Span::call_site())
+  pub fn get_identifier(&self) -> String {
+    let complex_type_list: Vec<String> = self.kind.split(':').map(|e| e.to_string()).collect();
+    complex_type_list.last().unwrap().to_owned()
+  }
+
+  pub fn get_ident_identifier(&self) -> Ident {
+    let identifier = self.get_identifier();
+    Ident::new(&identifier, Span::call_site())
   }
 }
