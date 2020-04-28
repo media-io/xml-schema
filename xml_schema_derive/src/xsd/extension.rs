@@ -1,4 +1,4 @@
-use crate::xsd::{attribute::Attribute, rust_types_mapping::RustTypesMapping};
+use crate::xsd::{attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence};
 use log::debug;
 use proc_macro2::TokenStream;
 use std::io::prelude::*;
@@ -15,6 +15,8 @@ pub struct Extension {
   pub base: String,
   #[yaserde(rename = "attribute")]
   pub attributes: Vec<Attribute>,
+  #[yaserde(rename = "sequence")]
+  pub sequences: Vec<Sequence>,
 }
 
 impl Extension {
@@ -39,4 +41,43 @@ impl Extension {
       #attributes
     )
   }
+}
+
+#[test]
+fn extension() {
+  let st = Extension {
+    base: "xs:string".to_string(),
+    attributes: vec![],
+    sequences: vec![],
+  };
+
+  let ts = st.get_implementation().to_string();
+  println!("{:?}", ts);
+  assert!(ts == "# [ yaserde ( text ) ] pub content : String ,");
+}
+
+#[test]
+fn extension_with_attributes() {
+  use crate::xsd::attribute::Required;
+
+  let st = Extension {
+    base: "xs:string".to_string(),
+    attributes: vec![
+      Attribute {
+        name: "attribute_1".to_string(),
+        kind: "xs:string".to_string(),
+        required: Required::Required,
+      },
+      Attribute {
+        name: "attribute_2".to_string(),
+        kind: "xs:bool".to_string(),
+        required: Required::Optional,
+      },
+    ],
+    sequences: vec![],
+  };
+
+  let ts = st.get_implementation().to_string();
+  println!("{:?}", ts);
+  assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] attribute_1 : String , # [ yaserde ( attribute ) ] attribute_2 : Option < Bool > ,");
 }

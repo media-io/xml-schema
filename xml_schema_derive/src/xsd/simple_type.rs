@@ -34,3 +34,17 @@ impl SimpleType {
     )
   }
 }
+
+#[test]
+fn simple_type() {
+  let st = SimpleType {
+    name: "test".to_string(),
+    restriction: None,
+    list: None,
+    union: None,
+  };
+
+  let ts = st.get_implementation(&quote!(), &None).to_string();
+
+  assert!(ts == "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] pub struct Test { # [ yaserde ( text ) ] pub content : String , }");
+}

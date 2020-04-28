@@ -1,4 +1,5 @@
 mod attribute;
+mod complex_content;
 mod complex_type;
 mod element;
 mod extension;

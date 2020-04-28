@@ -1,4 +1,6 @@
-use crate::xsd::{sequence::Sequence, simple_content::SimpleContent};
+use crate::xsd::{
+  complex_content::ComplexContent, sequence::Sequence, simple_content::SimpleContent,
+};
 use heck::CamelCase;
 use log::{debug, info};
 use proc_macro2::{Span, TokenStream};
@@ -14,6 +16,8 @@ pub struct ComplexType {
   pub sequence: Option<Sequence>,
   #[yaserde(rename = "simpleContent")]
   pub simple_content: Option<SimpleContent>,
+  #[yaserde(rename = "complexContent")]
+  pub complex_content: Option<ComplexContent>,
 }
 
 impl ComplexType {
@@ -43,6 +47,10 @@ impl ComplexType {
     } else {
       namespace_definition.clone()
     };
+
+    if self.complex_content.is_some() {
+      debug!("Complex Content: {:?}", self);
+    }
 
     let sub_types_implementation = self
       .sequence

@@ -82,20 +82,15 @@ impl Element {
       return quote!();
     }
 
-    let name =
-      if self.name.to_lowercase() == "type" {
-        "Kind".to_string()
-      } else {
-        self.name.to_snake_case().clone()
-      };
+    let name = if self.name.to_lowercase() == "type" {
+      "Kind".to_string()
+    } else {
+      self.name.to_snake_case()
+    };
 
     info!("Generate element {:?}", name);
 
-    let name = if multiple {
-      format!("{}s", name)
-    } else {
-      name
-    };
+    let name = if multiple { format!("{}s", name) } else { name };
 
     let attribute_name = Ident::new(&name, Span::call_site());
     let yaserde_rename = &self.name;

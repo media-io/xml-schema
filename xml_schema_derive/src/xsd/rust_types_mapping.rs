@@ -41,12 +41,11 @@ impl RustTypesMapping {
         let v: Vec<&str> = kind.split(':').collect();
         let struct_name = (*v.last().unwrap()).to_string();
 
-        let struct_name =
-          if struct_name == "" {
-            "String".to_string()
-          } else {
-            struct_name.to_camel_case()
-          };
+        let struct_name = if struct_name == "" {
+          "String".to_string()
+        } else {
+          struct_name.to_camel_case()
+        };
 
         let struct_name = Ident::new(&struct_name, Span::call_site());
 
@@ -54,4 +53,22 @@ impl RustTypesMapping {
       }
     }
   }
+}
+
+#[test]
+fn rust_mapping_types() {
+  assert!(RustTypesMapping::get("xs:boolean").to_string() == "bool");
+  assert!(RustTypesMapping::get("xs:positiveInteger").to_string() == "u32");
+  assert!(RustTypesMapping::get("xs:byte").to_string() == "i8");
+  assert!(RustTypesMapping::get("xs:unsignedByte").to_string() == "u8");
+  assert!(RustTypesMapping::get("xs:short").to_string() == "i16");
+  assert!(RustTypesMapping::get("xs:unsignedShort").to_string() == "u16");
+  assert!(RustTypesMapping::get("xs:int").to_string() == "i32");
+  assert!(RustTypesMapping::get("xs:integer").to_string() == "i32");
+  assert!(RustTypesMapping::get("xs:unsignedInt").to_string() == "u32");
+  assert!(RustTypesMapping::get("xs:long").to_string() == "i64");
+  assert!(RustTypesMapping::get("xs:unsignedLong").to_string() == "u64");
+  assert!(RustTypesMapping::get("xs:nonNegativeInteger").to_string() == "u64");
+  assert!(RustTypesMapping::get("xs:decimal").to_string() == "String");
+  assert!(RustTypesMapping::get("xs:string").to_string() == "String");
 }
