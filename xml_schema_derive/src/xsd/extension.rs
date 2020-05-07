@@ -1,4 +1,6 @@
-use crate::xsd::{attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence};
+use crate::xsd::{
+  attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence, XsdContext,
+};
 use log::debug;
 use proc_macro2::TokenStream;
 use std::io::prelude::*;
@@ -20,13 +22,13 @@ pub struct Extension {
 }
 
 impl Extension {
-  pub fn get_implementation(&self) -> TokenStream {
-    let rust_type = RustTypesMapping::get(&self.base);
+  pub fn get_implementation(&self, context: &XsdContext) -> TokenStream {
+    let rust_type = RustTypesMapping::get(context, &self.base);
 
     let attributes: TokenStream = self
       .attributes
       .iter()
-      .map(|attribute| attribute.get_implementation())
+      .map(|attribute| attribute.get_implementation(context))
       .collect();
 
     let inner_attribute = if format!("{}", rust_type) == "String" {
@@ -43,39 +45,52 @@ impl Extension {
   }
 }
 
-#[test]
-fn extension() {
-  let st = Extension {
-    base: "xs:string".to_string(),
-    attributes: vec![],
-    sequences: vec![],
-  };
+#[cfg(test)]
+mod tests {
+  use super::*;
 
-  let ts = st.get_implementation().to_string();
-  assert!(ts == "# [ yaserde ( text ) ] pub content : String ,");
-}
+  #[test]
+  fn extension() {
+    let st = Extension {
+      base: "xs:string".to_string(),
+      attributes: vec![],
+      sequences: vec![],
+    };
 
-#[test]
-fn extension_with_attributes() {
-  use crate::xsd::attribute::Required;
+    let context = XsdContext {
+      xml_schema_prefix: Some("xs".to_string()),
+    };
 
-  let st = Extension {
-    base: "xs:string".to_string(),
-    attributes: vec![
-      Attribute {
-        name: "attribute_1".to_string(),
-        kind: "xs:string".to_string(),
-        required: Required::Required,
-      },
-      Attribute {
-        name: "attribute_2".to_string(),
-        kind: "xs:bool".to_string(),
-        required: Required::Optional,
-      },
-    ],
-    sequences: vec![],
-  };
+    let ts = st.get_implementation(&context).to_string();
+    assert!(ts == "# [ yaserde ( text ) ] pub content : String ,");
+  }
 
-  let ts = st.get_implementation().to_string();
-  assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] attribute_1 : String , # [ yaserde ( attribute ) ] attribute_2 : Option < Bool > ,");
+  #[test]
+  fn extension_with_attributes() {
+    use crate::xsd::attribute::Required;
+
+    let st = Extension {
+      base: "xs:string".to_string(),
+      attributes: vec![
+        Attribute {
+          name: "attribute_1".to_string(),
+          kind: "xs:string".to_string(),
+          required: Required::Required,
+        },
+        Attribute {
+          name: "attribute_2".to_string(),
+          kind: "xs:boolean".to_string(),
+          required: Required::Optional,
+        },
+      ],
+      sequences: vec![],
+    };
+
+    let context = XsdContext {
+      xml_schema_prefix: Some("xs".to_string()),
+    };
+
+    let ts = st.get_implementation(&context).to_string();
+    assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] attribute_1 : String , # [ yaserde ( attribute ) ] attribute_2 : Option < bool > ,");
+  }
 }

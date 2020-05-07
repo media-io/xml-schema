@@ -1,5 +1,5 @@
 use crate::xsd::{
-  complex_content::ComplexContent, sequence::Sequence, simple_content::SimpleContent,
+  complex_content::ComplexContent, sequence::Sequence, simple_content::SimpleContent, XsdContext,
 };
 use heck::CamelCase;
 use log::{debug, info};
@@ -25,6 +25,7 @@ impl ComplexType {
     &self,
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
+    context: &XsdContext,
   ) -> TokenStream {
     let struct_name = Ident::new(&self.name.to_camel_case(), Span::call_site());
 
@@ -32,14 +33,14 @@ impl ComplexType {
     let sequence = self
       .sequence
       .as_ref()
-      .map(|sequence| sequence.get_implementation(prefix))
+      .map(|sequence| sequence.get_implementation(context, prefix))
       .unwrap_or_else(|| quote!());
 
     info!("Generate simple content");
     let simple_content = self
       .simple_content
       .as_ref()
-      .map(|simple_content| simple_content.get_implementation())
+      .map(|simple_content| simple_content.get_implementation(context))
       .unwrap_or_else(|| quote!());
 
     let namespace_definition = if self.name == "AssetType" {
@@ -55,7 +56,7 @@ impl ComplexType {
     let sub_types_implementation = self
       .sequence
       .as_ref()
-      .map(|sequence| sequence.get_sub_types_implementation(&namespace_definition, prefix))
+      .map(|sequence| sequence.get_sub_types_implementation(context, &namespace_definition, prefix))
       .unwrap_or_else(|| quote!());
 
     quote! {
@@ -70,11 +71,15 @@ impl ComplexType {
     }
   }
 
-  pub fn get_field_implementation(&self, prefix: &Option<String>) -> TokenStream {
+  pub fn get_field_implementation(
+    &self,
+    prefix: &Option<String>,
+    context: &XsdContext,
+  ) -> TokenStream {
     self
       .sequence
       .as_ref()
-      .map(|sequence| sequence.get_field_implementation(prefix))
+      .map(|sequence| sequence.get_field_implementation(context, prefix))
       .unwrap_or_else(|| quote!())
   }
 }

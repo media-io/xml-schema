@@ -1,4 +1,4 @@
-use crate::xsd::{list::List, restriction::Restriction, union::Union};
+use crate::xsd::{list::List, restriction::Restriction, union::Union, XsdContext};
 use heck::CamelCase;
 use log::debug;
 use proc_macro2::{Span, TokenStream};
@@ -21,6 +21,7 @@ impl SimpleType {
     &self,
     namespace_definition: &TokenStream,
     _prefix: &Option<String>,
+    _context: &XsdContext,
   ) -> TokenStream {
     let struct_name = Ident::new(&self.name.to_camel_case(), Span::call_site());
 
@@ -44,7 +45,13 @@ fn simple_type() {
     union: None,
   };
 
-  let ts = st.get_implementation(&quote!(), &None).to_string();
+  let context = XsdContext {
+    xml_schema_prefix: None,
+  };
+
+  let ts = st
+    .get_implementation(&quote!(), &None, &context)
+    .to_string();
 
   assert!(ts == "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] pub struct Test { # [ yaserde ( text ) ] pub content : String , }");
 }

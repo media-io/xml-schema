@@ -1,4 +1,4 @@
-use crate::xsd::extension::Extension;
+use crate::xsd::{extension::Extension, XsdContext};
 use log::debug;
 use proc_macro2::TokenStream;
 use std::io::prelude::*;
@@ -12,7 +12,7 @@ pub struct SimpleContent {
 }
 
 impl SimpleContent {
-  pub fn get_implementation(&self) -> TokenStream {
-    self.extension.get_implementation()
+  pub fn get_implementation(&self, context: &XsdContext) -> TokenStream {
+    self.extension.get_implementation(context)
   }
 }

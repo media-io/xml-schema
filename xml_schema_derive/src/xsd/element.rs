@@ -1,5 +1,6 @@
 use crate::xsd::{
   complex_type::ComplexType, max_occurences::MaxOccurences, rust_types_mapping::RustTypesMapping,
+  XsdContext,
 };
 use heck::{CamelCase, SnakeCase};
 use log::{debug, info};
@@ -30,6 +31,7 @@ impl Element {
     &self,
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
+    context: &XsdContext,
   ) -> TokenStream {
     let struct_name = Ident::new(&self.name, Span::call_site());
 
@@ -41,7 +43,7 @@ impl Element {
       "" => self
         .complex_type
         .iter()
-        .map(|complex_type| complex_type.get_field_implementation(prefix))
+        .map(|complex_type| complex_type.get_field_implementation(prefix, context))
         .collect(),
       _ => {
         let extern_type = self.get_ident_identifier();
@@ -65,15 +67,21 @@ impl Element {
     &self,
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
+    context: &XsdContext,
   ) -> TokenStream {
     if self.complex_type.is_empty() {
       return quote!();
     }
 
-    self.get_implementation(namespace_definition, prefix)
+    self.get_implementation(namespace_definition, prefix, context)
   }
 
-  pub fn get_field_implementation(&self, prefix: &Option<String>, multiple: bool) -> TokenStream {
+  pub fn get_field_implementation(
+    &self,
+    context: &XsdContext,
+    prefix: &Option<String>,
+    multiple: bool,
+  ) -> TokenStream {
     if self.name == "" {
       return quote!();
     }
@@ -96,7 +104,7 @@ impl Element {
     let yaserde_rename = &self.name;
 
     let rust_type = if self.complex_type.is_empty() {
-      RustTypesMapping::get(&self.kind)
+      RustTypesMapping::get(context, &self.kind)
     } else if self.complex_type.first().unwrap().sequence.is_some() {
       let list_wrapper = Ident::new(&self.name, Span::call_site());
       quote!(#list_wrapper)

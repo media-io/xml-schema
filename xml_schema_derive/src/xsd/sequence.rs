@@ -1,4 +1,4 @@
-use crate::xsd::element::Element;
+use crate::xsd::{element::Element, XsdContext};
 use log::{debug, info};
 use proc_macro2::TokenStream;
 use std::io::prelude::*;
@@ -12,17 +12,18 @@ pub struct Sequence {
 }
 
 impl Sequence {
-  pub fn get_implementation(&self, prefix: &Option<String>) -> TokenStream {
+  pub fn get_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
     info!("Generate elements");
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(prefix, false))
+      .map(|element| element.get_field_implementation(context, prefix, false))
       .collect()
   }
 
   pub fn get_sub_types_implementation(
     &self,
+    context: &XsdContext,
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
   ) -> TokenStream {
@@ -30,15 +31,19 @@ impl Sequence {
     self
       .elements
       .iter()
-      .map(|element| element.get_subtypes_implementation(namespace_definition, prefix))
+      .map(|element| element.get_subtypes_implementation(namespace_definition, prefix, context))
       .collect()
   }
 
-  pub fn get_field_implementation(&self, prefix: &Option<String>) -> TokenStream {
+  pub fn get_field_implementation(
+    &self,
+    context: &XsdContext,
+    prefix: &Option<String>,
+  ) -> TokenStream {
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(prefix, true))
+      .map(|element| element.get_field_implementation(context, prefix, true))
       .collect()
   }
 }
