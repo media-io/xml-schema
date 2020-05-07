@@ -87,17 +87,14 @@ impl XmlSchemaAttribute {
 
 #[cfg(test)]
 mod tests {
+  use super::*;
   use proc_macro2::{Span, TokenStream};
   use std::str::FromStr;
-  use super::*;
   use syn::{
     punctuated::Punctuated,
     token::{Bracket, Pound},
     AttrStyle::Outer,
-    Ident,
-    Path,
-    PathArguments,
-    PathSegment
+    Ident, Path, PathArguments, PathSegment,
   };
 
   fn generate_attributes(content: &str) -> Vec<Attribute> {
@@ -146,7 +143,9 @@ mod tests {
 
   #[test]
   fn parse_attributes() {
-    let attributes = generate_attributes(r#"(source = "schema.xsd", log_level="debug", target_prefix="prefix", store_generated_code="sample.rs")"#);
+    let attributes = generate_attributes(
+      r#"(source = "schema.xsd", log_level="debug", target_prefix="prefix", store_generated_code="sample.rs")"#,
+    );
     assert_eq!(
       XmlSchemaAttribute {
         log_level: log::Level::Debug,

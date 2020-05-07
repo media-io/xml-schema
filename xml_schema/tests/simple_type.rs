@@ -13,7 +13,7 @@ fn simple_type_string() {
   #[xml_schema(
       source = "xml_schema/tests/simple_type_string.xsd",
       target_prefix = "st"
-      store_generated_code = "st.rs"
+      // store_generated_code = "st.rs"
   )]
   struct SimpleTypeSchema;
 
@@ -26,10 +26,9 @@ fn simple_type_string() {
 
   let sample_1: SampleType = from_str(xml_1).unwrap();
 
-  assert!(
-    sample_1
-      == SampleType {
-        content: "Test content".to_string()
-      }
-  );
+  let model = SampleType {
+    content: "Test content".to_string(),
+  };
+
+  assert_eq!(sample_1, model);
 }
