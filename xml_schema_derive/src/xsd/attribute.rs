@@ -6,7 +6,11 @@ use syn::Ident;
 use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
+#[yaserde(
+  rename = "attribute",
+  prefix = "xs",
+  namespace = "xs: http://www.w3.org/2001/XMLSchema"
+)]
 pub struct Attribute {
   #[yaserde(prefix = "xs", attribute)]
   pub name: String,

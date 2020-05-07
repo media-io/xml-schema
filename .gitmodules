@@ -1,0 +1,3 @@
+[submodule "xml_schema/tests/xsdtests"]
+	path = xml_schema/tests/xsdtests
+	url = https://github.com/w3c/xsdtests.git

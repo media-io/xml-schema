@@ -27,6 +27,20 @@ impl RustTypesMapping {
     }
   }
 
+  pub fn is_xs_string(context: &XsdContext, kind: &str) -> bool {
+    let items: Vec<&str> = kind.split(':').collect();
+
+    if items.len() == 2 {
+      if Some((*items.first().unwrap()).to_string()) == context.xml_schema_prefix {
+        return *items.last().unwrap() == "string";
+      }
+    } else if items.len() == 1 && context.xml_schema_prefix.is_none() {
+      return *items.last().unwrap() == "string";
+    }
+
+    false
+  }
+
   fn basic_type(item: &str) -> TokenStream {
     match item {
       "bool" => quote!(bool),
@@ -36,12 +50,10 @@ impl RustTypesMapping {
       "unsignedByte" => quote!(u8),
       "short" => quote!(i16),
       "unsignedShort" => quote!(u16),
-      "int" => quote!(i32),
-      "integer" => quote!(i32),
+      "int" | "integer" => quote!(i32),
       "unsignedInt" => quote!(u32),
       "long" => quote!(i64),
-      "unsignedLong" => quote!(u64),
-      "nonNegativeInteger" => quote!(u64),
+      "unsignedLong" | "nonNegativeInteger" => quote!(u64),
       "decimal" => quote!(String), // TODO replace with f64
       "string" => quote!(String),
       "normalizedString" => quote!(String),

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="BaseType">
+    <xs:attribute name="strings" type="StringList"/>
+    <xs:attribute name="integers" type="IntegerList"/>
+    <xs:attribute name="booleans" type="BooleanList"/>
+  </xs:complexType>
+
+  <xs:simpleType name="StringList">
+    <xs:list itemType="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="IntegerList">
+    <xs:list itemType="xs:integer"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="BooleanList">
+    <xs:list itemType="xs:boolean"/>
+  </xs:simpleType>
+</xs:schema>

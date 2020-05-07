@@ -15,9 +15,9 @@ pub struct Element {
   #[yaserde(attribute)]
   pub name: String,
   #[yaserde(rename = "type", attribute)]
-  pub kind: String,
+  pub kind: Option<String>,
   #[yaserde(rename = "ref", attribute)]
-  pub refers: String,
+  pub refers: Option<String>,
   #[yaserde(rename = "minOccurs", attribute)]
   pub min_occurences: Option<u64>,
   #[yaserde(rename = "maxOccurs", attribute)]
@@ -33,25 +33,26 @@ impl Element {
     prefix: &Option<String>,
     context: &XsdContext,
   ) -> TokenStream {
-    let struct_name = Ident::new(&self.name, Span::call_site());
+    let struct_name = Ident::new(&self.name.to_camel_case(), Span::call_site());
 
-    let fields = match self.get_identifier().as_ref() {
-      "string" => quote!(
-        #[yaserde(text)]
-        pub content: String,
-      ),
-      "" => self
+    let fields = if let Some(kind) = &self.kind {
+      let subtype_mode = if RustTypesMapping::is_xs_string(context, kind) {
+        quote!(text)
+      } else {
+        quote!(flatten)
+      };
+
+      let extern_type = RustTypesMapping::get(context, kind);
+      quote!(
+        #[yaserde(#subtype_mode)]
+        pub content: #extern_type,
+      )
+    } else {
+      self
         .complex_type
         .iter()
         .map(|complex_type| complex_type.get_field_implementation(prefix, context))
-        .collect(),
-      _ => {
-        let extern_type = self.get_ident_identifier();
-        quote!(
-          #[yaserde(flatten)]
-          pub content: #extern_type,
-        )
-      }
+        .collect()
     };
 
     quote! {
@@ -86,9 +87,9 @@ impl Element {
       return quote!();
     }
 
-    if self.kind == "md:CompObjEntry-type" {
-      return quote!();
-    }
+    // if self.kind == "md:CompObjEntry-type" {
+    //   return quote!();
+    // }
 
     let name = if self.name.to_lowercase() == "type" {
       "Kind".to_string()
@@ -104,7 +105,11 @@ impl Element {
     let yaserde_rename = &self.name;
 
     let rust_type = if self.complex_type.is_empty() {
-      RustTypesMapping::get(context, &self.kind)
+      if let Some(kind) = &self.kind {
+        RustTypesMapping::get(context, kind)
+      } else {
+        unimplemented!()
+      }
     } else if self.complex_type.first().unwrap().sequence.is_some() {
       let list_wrapper = Ident::new(&self.name, Span::call_site());
       quote!(#list_wrapper)
@@ -132,14 +137,63 @@ impl Element {
       pub #attribute_name: #rust_type,
     }
   }
+}
 
-  pub fn get_identifier(&self) -> String {
-    let complex_type_list: Vec<String> = self.kind.split(':').map(|e| e.to_string()).collect();
-    complex_type_list.last().unwrap().to_owned()
+#[cfg(test)]
+mod tests {
+  use super::*;
+  static DERIVES: &str =
+    "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] ";
+
+  #[test]
+  fn extern_type() {
+    let element = Element {
+      name: "volume".to_string(),
+      kind: Some("books:volume-type".to_string()),
+      refers: None,
+      min_occurences: None,
+      max_occurences: None,
+      complex_type: vec![],
+    };
+
+    let context = XsdContext {
+      xml_schema_prefix: Some("xs".to_string()),
+    };
+
+    let ts = element.get_implementation(&quote!(), &None, &context);
+
+    assert_eq!(
+      ts.to_string(),
+      format!(
+        "{}pub struct Volume {{ # [ yaserde ( flatten ) ] pub content : VolumeType , }}",
+        DERIVES
+      )
+    );
   }
 
-  pub fn get_ident_identifier(&self) -> Ident {
-    let identifier = self.get_identifier().to_camel_case();
-    Ident::new(&identifier, Span::call_site())
+  #[test]
+  fn xs_string_element() {
+    let element = Element {
+      name: "volume".to_string(),
+      kind: Some("xs:string".to_string()),
+      refers: None,
+      min_occurences: None,
+      max_occurences: None,
+      complex_type: vec![],
+    };
+
+    let context = XsdContext {
+      xml_schema_prefix: Some("xs".to_string()),
+    };
+
+    let ts = element.get_implementation(&quote!(), &None, &context);
+
+    assert_eq!(
+      ts.to_string(),
+      format!(
+        "{}pub struct Volume {{ # [ yaserde ( text ) ] pub content : String , }}",
+        DERIVES
+      )
+    );
   }
 }

@@ -1,5 +1,6 @@
 use crate::xsd::{
-  complex_content::ComplexContent, sequence::Sequence, simple_content::SimpleContent, XsdContext,
+  attribute::Attribute, complex_content::ComplexContent, sequence::Sequence,
+  simple_content::SimpleContent, XsdContext,
 };
 use heck::CamelCase;
 use log::{debug, info};
@@ -9,10 +10,16 @@ use syn::Ident;
 use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
+#[yaserde(
+  rename = "complexType"
+  prefix = "xs",
+  namespace = "xs: http://www.w3.org/2001/XMLSchema"
+)]
 pub struct ComplexType {
   #[yaserde(attribute)]
   pub name: String,
+  #[yaserde(rename = "attribute")]
+  pub attributes: Vec<Attribute>,
   pub sequence: Option<Sequence>,
   #[yaserde(rename = "simpleContent")]
   pub simple_content: Option<SimpleContent>,
@@ -53,6 +60,12 @@ impl ComplexType {
       debug!("Complex Content: {:?}", self);
     }
 
+    let attributes: TokenStream = self
+      .attributes
+      .iter()
+      .map(|attribute| attribute.get_implementation(context))
+      .collect();
+
     let sub_types_implementation = self
       .sequence
       .as_ref()
@@ -65,6 +78,7 @@ impl ComplexType {
       pub struct #struct_name {
         #sequence
         #simple_content
+        #attributes
       }
 
       #sub_types_implementation
