@@ -59,11 +59,15 @@ impl XmlSchemaAttribute {
                         "info" => log::Level::Info,
                         "warn" => log::Level::Warn,
                         "error" => log::Level::Error,
-                        _ => log::Level::Warn,
+                        _ => {
+                          panic!("Bad log level: {}", value);
+                        },
                       };
                     }
                   }
-                  _ => {}
+                  _ => {
+                    panic!("Bad XmlSchema attribute: {}", ident.to_string());
+                  }
                 }
               }
             }
@@ -155,5 +159,67 @@ mod tests {
       },
       XmlSchemaAttribute::parse(&attributes)
     );
+  }
+
+  #[test]
+  fn parse_log_levels() {
+    let attributes = generate_attributes(
+      r#"(source = "schema.xsd", log_level="info")"#,
+    );
+    assert_eq!(
+      XmlSchemaAttribute {
+        log_level: log::Level::Info,
+        source: "schema.xsd".to_string(),
+        target_prefix: None,
+        store_generated_code: None,
+      },
+      XmlSchemaAttribute::parse(&attributes)
+    );
+
+    let attributes = generate_attributes(
+      r#"(source = "schema.xsd", log_level="warn")"#,
+    );
+    assert_eq!(
+      XmlSchemaAttribute {
+        log_level: log::Level::Warn,
+        source: "schema.xsd".to_string(),
+        target_prefix: None,
+        store_generated_code: None,
+      },
+      XmlSchemaAttribute::parse(&attributes)
+    );
+
+    let attributes = generate_attributes(
+      r#"(source = "schema.xsd", log_level="error")"#,
+    );
+    assert_eq!(
+      XmlSchemaAttribute {
+        log_level: log::Level::Error,
+        source: "schema.xsd".to_string(),
+        target_prefix: None,
+        store_generated_code: None,
+      },
+      XmlSchemaAttribute::parse(&attributes)
+    );
+  }
+
+  #[test]
+  #[should_panic]
+  fn parse_bad_log_level() {
+    let attributes = generate_attributes(
+      r#"(source = "schema.xsd", log_level="quiet")"#,
+    );
+    
+    XmlSchemaAttribute::parse(&attributes);
+  }
+
+  #[test]
+  #[should_panic]
+  fn parse_bad_attribute() {
+    let attributes = generate_attributes(
+      r#"(source = "schema.xsd", bad-key="bad_value")"#,
+    );
+    
+    XmlSchemaAttribute::parse(&attributes);
   }
 }
