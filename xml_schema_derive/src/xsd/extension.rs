@@ -52,7 +52,6 @@ fn extension() {
   };
 
   let ts = st.get_implementation().to_string();
-  println!("{:?}", ts);
   assert!(ts == "# [ yaserde ( text ) ] pub content : String ,");
 }
 
@@ -78,6 +77,5 @@ fn extension_with_attributes() {
   };
 
   let ts = st.get_implementation().to_string();
-  println!("{:?}", ts);
   assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] attribute_1 : String , # [ yaserde ( attribute ) ] attribute_2 : Option < Bool > ,");
 }
