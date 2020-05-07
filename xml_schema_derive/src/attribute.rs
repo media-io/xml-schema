@@ -61,7 +61,7 @@ impl XmlSchemaAttribute {
                         "error" => log::Level::Error,
                         _ => {
                           panic!("Bad log level: {}", value);
-                        },
+                        }
                       };
                     }
                   }
@@ -163,9 +163,7 @@ mod tests {
 
   #[test]
   fn parse_log_levels() {
-    let attributes = generate_attributes(
-      r#"(source = "schema.xsd", log_level="info")"#,
-    );
+    let attributes = generate_attributes(r#"(source = "schema.xsd", log_level="info")"#);
     assert_eq!(
       XmlSchemaAttribute {
         log_level: log::Level::Info,
@@ -176,9 +174,7 @@ mod tests {
       XmlSchemaAttribute::parse(&attributes)
     );
 
-    let attributes = generate_attributes(
-      r#"(source = "schema.xsd", log_level="warn")"#,
-    );
+    let attributes = generate_attributes(r#"(source = "schema.xsd", log_level="warn")"#);
     assert_eq!(
       XmlSchemaAttribute {
         log_level: log::Level::Warn,
@@ -189,9 +185,7 @@ mod tests {
       XmlSchemaAttribute::parse(&attributes)
     );
 
-    let attributes = generate_attributes(
-      r#"(source = "schema.xsd", log_level="error")"#,
-    );
+    let attributes = generate_attributes(r#"(source = "schema.xsd", log_level="error")"#);
     assert_eq!(
       XmlSchemaAttribute {
         log_level: log::Level::Error,
@@ -206,20 +200,16 @@ mod tests {
   #[test]
   #[should_panic]
   fn parse_bad_log_level() {
-    let attributes = generate_attributes(
-      r#"(source = "schema.xsd", log_level="quiet")"#,
-    );
-    
+    let attributes = generate_attributes(r#"(source = "schema.xsd", log_level="quiet")"#);
+
     XmlSchemaAttribute::parse(&attributes);
   }
 
   #[test]
   #[should_panic]
   fn parse_bad_attribute() {
-    let attributes = generate_attributes(
-      r#"(source = "schema.xsd", bad-key="bad_value")"#,
-    );
-    
+    let attributes = generate_attributes(r#"(source = "schema.xsd", bad-key="bad_value")"#);
+
     XmlSchemaAttribute::parse(&attributes);
   }
 }
