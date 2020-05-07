@@ -59,5 +59,8 @@ fn simple_type_list() {
   assert_eq!(sample_1, model);
 
   let data = to_string(&model).unwrap();
-  assert_eq!(data, r#"<?xml version="1.0" encoding="utf-8"?><BaseType strings="value1 value2" integers="3 6" booleans="true false" />"#);
+  assert_eq!(
+    data,
+    r#"<?xml version="1.0" encoding="utf-8"?><BaseType strings="value1 value2" integers="3 6" booleans="true false" />"#
+  );
 }
