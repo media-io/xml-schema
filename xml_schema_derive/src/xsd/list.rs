@@ -22,7 +22,7 @@ impl List {
     let list_type = RustTypesMapping::get(context, &self.item_type);
 
     quote!(
-      #[derive(Clone, Debug, Default, PartialEq, YaSerialize)]
+      #[derive(Clone, Debug, Default, PartialEq)]
       pub struct #struct_name {
         items: Vec<#list_type>
       }
@@ -30,9 +30,7 @@ impl List {
       impl YaDeserialize for #struct_name {
         fn deserialize<R: Read>(reader: &mut yaserde::de::Deserializer<R>) -> Result<Self, String> {
           loop {
-            let event = reader.next_event()?;
-            println!("{:?}", event);
-            match event {
+            match reader.next_event()? {
               xml::reader::XmlEvent::StartElement{..} => {}
               xml::reader::XmlEvent::Characters(ref text_content) => {
                 let items: Vec<#list_type> =
@@ -49,6 +47,18 @@ impl List {
           }
 
           Err("Unable to parse attribute".to_string())
+        }
+      }
+
+      impl YaSerialize for #struct_name {
+        fn serialize<W: Write>(&self, writer: &mut yaserde::ser::Serializer<W>) -> Result<(), String> {
+          let content =
+            self.items.iter().map(|item| item.to_string()).collect::<Vec<String>>().join(" ");
+
+          let data_event = xml::writer::XmlEvent::characters(&content);
+          writer.write(data_event).map_err(|e| e.to_string())?;
+
+          Ok(())
         }
       }
     )
