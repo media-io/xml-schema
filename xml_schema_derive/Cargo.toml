@@ -1,6 +1,6 @@
 [package]
 name = "xml-schema-derive"
-version = "0.0.1"
+version = "0.0.2"
 description = "Structure generator from XSD source file"
 edition = "2018"
 authors = ["Marc-Antoine Arnaud <maarnaud@media-io.com>"]
