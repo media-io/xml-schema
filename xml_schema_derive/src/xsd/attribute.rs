@@ -57,7 +57,7 @@ impl Attribute {
 
     quote!(
       #[yaserde(attribute)]
-      #field_name: #rust_type,
+      pub #field_name: #rust_type,
     )
   }
 }
