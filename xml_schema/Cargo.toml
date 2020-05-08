@@ -12,7 +12,7 @@ documentation = "https://docs.rs/xml_schema"
 readme = "../README.md"
 
 [dependencies]
-xml-schema-derive = { version = "0.0.1", path = "../xml_schema_derive", optional = true }
+xml-schema-derive = { path = "../xml_schema_derive", optional = true }
 
 [dev-dependencies]
 log = "0.4"
