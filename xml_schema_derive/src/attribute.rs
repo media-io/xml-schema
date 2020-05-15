@@ -1,14 +1,14 @@
-use proc_macro2::token_stream::IntoIter;
-use proc_macro2::Delimiter;
-use proc_macro2::TokenTree;
+use proc_macro2::{token_stream::IntoIter, Delimiter, TokenTree};
+use std::collections::BTreeMap;
 use syn::Attribute;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct XmlSchemaAttribute {
   pub log_level: log::Level,
+  pub module_namespace_mappings: BTreeMap<String, String>,
   pub source: String,
-  pub target_prefix: Option<String>,
   pub store_generated_code: Option<String>,
+  pub target_prefix: Option<String>,
 }
 
 fn get_value(iter: &mut IntoIter) -> Option<String> {
@@ -28,6 +28,7 @@ fn get_value(iter: &mut IntoIter) -> Option<String> {
 impl XmlSchemaAttribute {
   pub fn parse(attrs: &[Attribute]) -> XmlSchemaAttribute {
     let mut log_level = log::Level::Warn;
+    let mut module_namespace_mappings = BTreeMap::new();
     let mut source = None;
     let mut store_generated_code = None;
     let mut target_prefix = None;
@@ -42,6 +43,18 @@ impl XmlSchemaAttribute {
             while let Some(item) = attr_iter.next() {
               if let TokenTree::Ident(ident) = item {
                 match ident.to_string().as_str() {
+                  "module_namespace_mapping" => {
+                    if let Some(module_namespace_mapping) = get_value(&mut attr_iter) {
+                      let splitted: Vec<&str> = module_namespace_mapping.split(": ").collect();
+                      if splitted.len() == 2 {
+                        module_namespace_mappings
+                          .insert(splitted[0].to_owned(), splitted[1].to_owned());
+                      }
+                      if splitted.len() == 1 {
+                        module_namespace_mappings.insert("".to_owned(), splitted[0].to_owned());
+                      }
+                    }
+                  }
                   "source" => {
                     source = get_value(&mut attr_iter);
                   }
@@ -82,6 +95,7 @@ impl XmlSchemaAttribute {
 
     XmlSchemaAttribute {
       log_level,
+      module_namespace_mappings,
       source: source.unwrap(),
       store_generated_code,
       target_prefix,
@@ -137,9 +151,10 @@ mod tests {
     assert_eq!(
       XmlSchemaAttribute {
         log_level: log::Level::Warn,
+        module_namespace_mappings: BTreeMap::new(),
         source: "schema.xsd".to_string(),
-        target_prefix: None,
         store_generated_code: None,
+        target_prefix: None,
       },
       XmlSchemaAttribute::parse(&attributes)
     );
@@ -153,9 +168,10 @@ mod tests {
     assert_eq!(
       XmlSchemaAttribute {
         log_level: log::Level::Debug,
+        module_namespace_mappings: BTreeMap::new(),
         source: "schema.xsd".to_string(),
-        target_prefix: Some("prefix".to_string()),
         store_generated_code: Some("sample.rs".to_string()),
+        target_prefix: Some("prefix".to_string()),
       },
       XmlSchemaAttribute::parse(&attributes)
     );
@@ -167,9 +183,10 @@ mod tests {
     assert_eq!(
       XmlSchemaAttribute {
         log_level: log::Level::Info,
+        module_namespace_mappings: BTreeMap::new(),
         source: "schema.xsd".to_string(),
-        target_prefix: None,
         store_generated_code: None,
+        target_prefix: None,
       },
       XmlSchemaAttribute::parse(&attributes)
     );
@@ -178,9 +195,10 @@ mod tests {
     assert_eq!(
       XmlSchemaAttribute {
         log_level: log::Level::Warn,
+        module_namespace_mappings: BTreeMap::new(),
         source: "schema.xsd".to_string(),
-        target_prefix: None,
         store_generated_code: None,
+        target_prefix: None,
       },
       XmlSchemaAttribute::parse(&attributes)
     );
@@ -189,9 +207,10 @@ mod tests {
     assert_eq!(
       XmlSchemaAttribute {
         log_level: log::Level::Error,
+        module_namespace_mappings: BTreeMap::new(),
         source: "schema.xsd".to_string(),
-        target_prefix: None,
         store_generated_code: None,
+        target_prefix: None,
       },
       XmlSchemaAttribute::parse(&attributes)
     );

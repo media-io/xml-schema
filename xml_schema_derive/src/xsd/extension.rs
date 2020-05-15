@@ -57,9 +57,9 @@ mod tests {
       sequences: vec![],
     };
 
-    let context = XsdContext {
-      xml_schema_prefix: Some("xs".to_string()),
-    };
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
 
     let ts = st.get_implementation(&context).to_string();
     assert!(ts == "# [ yaserde ( text ) ] pub content : String ,");
@@ -86,11 +86,11 @@ mod tests {
       sequences: vec![],
     };
 
-    let context = XsdContext {
-      xml_schema_prefix: Some("xs".to_string()),
-    };
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
 
     let ts = st.get_implementation(&context).to_string();
-    assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] attribute_1 : String , # [ yaserde ( attribute ) ] attribute_2 : Option < bool > ,");
+    assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] pub attribute_1 : String , # [ yaserde ( attribute ) ] pub attribute_2 : Option < bool > ,");
   }
 }

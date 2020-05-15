@@ -43,6 +43,7 @@ impl SimpleType {
 #[cfg(test)]
 mod tests {
   use super::*;
+
   static DERIVES: &str =
     "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] ";
 
@@ -55,9 +56,9 @@ mod tests {
       union: None,
     };
 
-    let context = XsdContext {
-      xml_schema_prefix: None,
-    };
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
 
     let ts = st
       .get_implementation(&quote!(), &None, &context)

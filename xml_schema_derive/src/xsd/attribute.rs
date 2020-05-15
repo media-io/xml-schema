@@ -74,14 +74,14 @@ mod tests {
       required: Required::Required,
     };
 
-    let context = XsdContext {
-      xml_schema_prefix: Some("xs".to_string()),
-    };
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
 
     let implementation = format!("{}", attribute.get_implementation(&context));
     assert_eq!(
       implementation,
-      "# [ yaserde ( attribute ) ] language : String ,".to_string()
+      "# [ yaserde ( attribute ) ] pub language : String ,".to_string()
     );
   }
 
@@ -93,14 +93,14 @@ mod tests {
       required: Required::Optional,
     };
 
-    let context = XsdContext {
-      xml_schema_prefix: Some("xs".to_string()),
-    };
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
 
     let implementation = format!("{}", attribute.get_implementation(&context));
     assert_eq!(
       implementation,
-      "# [ yaserde ( attribute ) ] language : Option < String > ,".to_string()
+      "# [ yaserde ( attribute ) ] pub language : Option < String > ,".to_string()
     );
   }
 
@@ -112,14 +112,14 @@ mod tests {
       required: Required::Optional,
     };
 
-    let context = XsdContext {
-      xml_schema_prefix: Some("xs".to_string()),
-    };
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
 
     let implementation = format!("{}", attribute.get_implementation(&context));
     assert_eq!(
       implementation,
-      "# [ yaserde ( attribute ) ] kind : Option < String > ,".to_string()
+      "# [ yaserde ( attribute ) ] pub kind : Option < String > ,".to_string()
     );
   }
 }

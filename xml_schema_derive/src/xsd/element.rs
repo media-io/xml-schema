@@ -142,6 +142,7 @@ impl Element {
 #[cfg(test)]
 mod tests {
   use super::*;
+
   static DERIVES: &str =
     "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] ";
 
@@ -156,9 +157,9 @@ mod tests {
       complex_type: vec![],
     };
 
-    let context = XsdContext {
-      xml_schema_prefix: Some("xs".to_string()),
-    };
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
 
     let ts = element.get_implementation(&quote!(), &None, &context);
 
@@ -182,9 +183,9 @@ mod tests {
       complex_type: vec![],
     };
 
-    let context = XsdContext {
-      xml_schema_prefix: Some("xs".to_string()),
-    };
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
 
     let ts = element.get_implementation(&quote!(), &None, &context);
 

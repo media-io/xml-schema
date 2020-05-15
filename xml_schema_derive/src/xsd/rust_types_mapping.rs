@@ -1,7 +1,7 @@
 use crate::xsd::XsdContext;
 use heck::CamelCase;
-use proc_macro2::{Span, TokenStream};
-use syn::Ident;
+use proc_macro2::TokenStream;
+use syn::{parse_str, TypePath};
 
 #[derive(Debug)]
 pub struct RustTypesMapping {}
@@ -11,16 +11,16 @@ impl RustTypesMapping {
     let items: Vec<&str> = kind.split(':').collect();
 
     if items.len() == 2 {
-      if Some((*items.first().unwrap()).to_string()) == context.xml_schema_prefix {
+      if context.match_xml_schema_prefix(*items.first().unwrap()) {
         RustTypesMapping::basic_type(*items.last().unwrap())
       } else {
-        RustTypesMapping::extern_type(*items.last().unwrap())
+        RustTypesMapping::extern_type(context, items)
       }
     } else if items.len() == 1 {
-      if context.xml_schema_prefix.is_none() {
-        RustTypesMapping::basic_type(*items.last().unwrap())
+      if context.has_xml_schema_prefix() {
+        RustTypesMapping::extern_type(context, items)
       } else {
-        RustTypesMapping::extern_type(*items.last().unwrap())
+        RustTypesMapping::basic_type(*items.last().unwrap())
       }
     } else {
       unimplemented!();
@@ -31,10 +31,10 @@ impl RustTypesMapping {
     let items: Vec<&str> = kind.split(':').collect();
 
     if items.len() == 2 {
-      if Some((*items.first().unwrap()).to_string()) == context.xml_schema_prefix {
+      if context.match_xml_schema_prefix(*items.first().unwrap()) {
         return *items.last().unwrap() == "string";
       }
-    } else if items.len() == 1 && context.xml_schema_prefix.is_none() {
+    } else if items.len() == 1 && !context.has_xml_schema_prefix() {
       return *items.last().unwrap() == "string";
     }
 
@@ -74,40 +74,76 @@ impl RustTypesMapping {
     }
   }
 
-  fn extern_type(item: &str) -> TokenStream {
-    let struct_name = if item == "" {
+  fn extern_type(context: &XsdContext, items: Vec<&str>) -> TokenStream {
+    let struct_name = if *items.last().unwrap() == "" {
       "String".to_string()
     } else {
-      item.to_camel_case()
+      (*items.last().unwrap().to_camel_case()).to_string()
     };
 
-    let struct_name = Ident::new(&struct_name, Span::call_site());
+    let struct_name = if items.len() == 2 {
+      let prefix = items.first().unwrap();
+      if let Some(module) = context.get_module(&prefix) {
+        format!("{}::{}", module, struct_name)
+      } else {
+        struct_name
+      }
+    } else {
+      struct_name
+    };
 
+    let struct_name = parse_str::<TypePath>(&struct_name).unwrap();
     quote!(#struct_name)
   }
 }
 
-#[test]
-fn rust_mapping_types() {
-  let context = XsdContext {
-    xml_schema_prefix: Some("xs".to_string()),
-  };
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use std::collections::BTreeMap;
 
-  assert!(RustTypesMapping::get(&context, "xs:boolean").to_string() == "bool");
-  assert!(RustTypesMapping::get(&context, "xs:positiveInteger").to_string() == "u32");
-  assert!(RustTypesMapping::get(&context, "xs:byte").to_string() == "i8");
-  assert!(RustTypesMapping::get(&context, "xs:unsignedByte").to_string() == "u8");
-  assert!(RustTypesMapping::get(&context, "xs:short").to_string() == "i16");
-  assert!(RustTypesMapping::get(&context, "xs:unsignedShort").to_string() == "u16");
-  assert!(RustTypesMapping::get(&context, "xs:int").to_string() == "i32");
-  assert!(RustTypesMapping::get(&context, "xs:integer").to_string() == "i32");
-  assert!(RustTypesMapping::get(&context, "xs:unsignedInt").to_string() == "u32");
-  assert!(RustTypesMapping::get(&context, "xs:long").to_string() == "i64");
-  assert!(RustTypesMapping::get(&context, "xs:unsignedLong").to_string() == "u64");
-  assert!(RustTypesMapping::get(&context, "xs:nonNegativeInteger").to_string() == "u64");
-  assert!(RustTypesMapping::get(&context, "xs:decimal").to_string() == "String");
-  assert!(RustTypesMapping::get(&context, "xs:string").to_string() == "String");
-  assert!(RustTypesMapping::get(&context, "xs:string").to_string() == "String");
+  #[test]
+  fn rust_mapping_types() {
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
 
-  assert!(RustTypesMapping::get(&context, "other:type").to_string() == "Type");
+    assert!(RustTypesMapping::get(&context, "xs:boolean").to_string() == "bool");
+    assert!(RustTypesMapping::get(&context, "xs:positiveInteger").to_string() == "u32");
+    assert!(RustTypesMapping::get(&context, "xs:byte").to_string() == "i8");
+    assert!(RustTypesMapping::get(&context, "xs:unsignedByte").to_string() == "u8");
+    assert!(RustTypesMapping::get(&context, "xs:short").to_string() == "i16");
+    assert!(RustTypesMapping::get(&context, "xs:unsignedShort").to_string() == "u16");
+    assert!(RustTypesMapping::get(&context, "xs:int").to_string() == "i32");
+    assert!(RustTypesMapping::get(&context, "xs:integer").to_string() == "i32");
+    assert!(RustTypesMapping::get(&context, "xs:unsignedInt").to_string() == "u32");
+    assert!(RustTypesMapping::get(&context, "xs:long").to_string() == "i64");
+    assert!(RustTypesMapping::get(&context, "xs:unsignedLong").to_string() == "u64");
+    assert!(RustTypesMapping::get(&context, "xs:nonNegativeInteger").to_string() == "u64");
+    assert!(RustTypesMapping::get(&context, "xs:decimal").to_string() == "String");
+    assert!(RustTypesMapping::get(&context, "xs:string").to_string() == "String");
+    assert!(RustTypesMapping::get(&context, "xs:string").to_string() == "String");
+
+    assert!(RustTypesMapping::get(&context, "other:type").to_string() == "Type");
+  }
+
+  #[test]
+  fn extern_types() {
+    let context = XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:example="http://example.com"></xs:schema>"#).unwrap();
+    let mut mapping = BTreeMap::new();
+    mapping.insert(
+      "http://example.com".to_string(),
+      "rust_example_module".to_string(),
+    );
+
+    let context = context.with_module_namespace_mappings(&mapping);
+    assert!(
+      RustTypesMapping::get(&context, "example:MyType").to_string()
+        == "rust_example_module :: MyType"
+    );
+
+    assert!(
+      RustTypesMapping::get(&context, "example:").to_string() == "rust_example_module :: String"
+    );
+  }
 }
