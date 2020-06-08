@@ -1,4 +1,5 @@
 mod attribute;
+mod attribute_group;
 mod complex_content;
 mod complex_type;
 mod element;
@@ -57,6 +58,14 @@ impl Xsd {
 
       fs::read_to_string(source).map_err(|e| e.to_string())?
     };
+
+    // skip BOM header, can be present on some files
+    let content =
+      if &content.as_bytes()[0..3] == [0xef, 0xbb, 0xbf] {
+        content[3..].to_owned()
+      } else {
+        content
+      };
 
     Xsd::new(&content, module_namespace_mappings)
   }

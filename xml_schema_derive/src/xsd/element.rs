@@ -33,7 +33,10 @@ impl Element {
     prefix: &Option<String>,
     context: &XsdContext,
   ) -> TokenStream {
-    let struct_name = Ident::new(&self.name.to_camel_case(), Span::call_site());
+    let struct_name = Ident::new(
+      &self.name.replace(".", "_").to_camel_case(),
+      Span::call_site(),
+    );
 
     let fields = if let Some(kind) = &self.kind {
       let subtype_mode = if RustTypesMapping::is_xs_string(context, kind) {
@@ -43,6 +46,7 @@ impl Element {
       };
 
       let extern_type = RustTypesMapping::get(context, kind);
+
       quote!(
         #[yaserde(#subtype_mode)]
         pub content: #extern_type,
@@ -108,7 +112,10 @@ impl Element {
       if let Some(kind) = &self.kind {
         RustTypesMapping::get(context, kind)
       } else {
-        unimplemented!()
+        panic!(
+          "[Element] {} unimplemented type: {:?}",
+          self.name, self.kind,
+        );
       }
     } else if self.complex_type.first().unwrap().sequence.is_some() {
       let list_wrapper = Ident::new(&self.name, Span::call_site());
@@ -116,8 +123,11 @@ impl Element {
     } else if self.complex_type.first().unwrap().simple_content.is_some() {
       quote!(String)
     } else {
-      println!("UNIMPLEMENTED {:?}", self);
-      unimplemented!()
+        println!("{:?}", self);
+      panic!(
+        "[Element] {} unimplemented complex type with type: {:?}",
+        self.name, self.kind
+      );
     };
 
     let rust_type = if multiple {

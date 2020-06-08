@@ -60,6 +60,10 @@ impl List {
 
           Ok(())
         }
+
+        fn serialize_attributes(&self, mut source_attributes: Vec<xml::attribute::OwnedAttribute>, mut source_namespace: xml::namespace::Namespace) -> Result<(Vec<xml::attribute::OwnedAttribute>, xml::namespace::Namespace), String> {
+          Ok((source_attributes, source_namespace))
+        }
       }
     )
   }

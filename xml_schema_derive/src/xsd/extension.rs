@@ -73,13 +73,15 @@ mod tests {
       base: "xs:string".to_string(),
       attributes: vec![
         Attribute {
-          name: "attribute_1".to_string(),
-          kind: "xs:string".to_string(),
+          name: Some("attribute_1".to_string()),
+          kind: Some("xs:string".to_string()),
+          reference: None,
           required: Required::Required,
         },
         Attribute {
-          name: "attribute_2".to_string(),
-          kind: "xs:boolean".to_string(),
+          name: Some("attribute_2".to_string()),
+          kind: Some("xs:boolean".to_string()),
+          reference: None,
           required: Required::Optional,
         },
       ],

@@ -1,4 +1,4 @@
-use crate::xsd::{complex_type, element, import, qualification, simple_type, XsdContext};
+use crate::xsd::{attribute, attribute_group, complex_type, element, import, qualification, simple_type, XsdContext};
 use log::{debug, info};
 use proc_macro2::TokenStream;
 use std::io::prelude::*;
@@ -25,6 +25,10 @@ pub struct Schema {
   pub simple_type: Vec<simple_type::SimpleType>,
   #[yaserde(rename = "complexType")]
   pub complex_type: Vec<complex_type::ComplexType>,
+  #[yaserde(rename = "attribute")]
+  pub attributes: Vec<attribute::Attribute>,
+  #[yaserde(rename = "attributeGroup")]
+  pub attribute_group: Vec<attribute_group::AttributeGroup>,
 }
 
 impl Schema {

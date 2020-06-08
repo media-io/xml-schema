@@ -54,6 +54,7 @@ impl RustTypesMapping {
       "unsignedInt" => quote!(u32),
       "long" => quote!(i64),
       "unsignedLong" | "nonNegativeInteger" => quote!(u64),
+      "double" => quote!(f64),
       "decimal" => quote!(String), // TODO replace with f64
       "string" => quote!(String),
       "normalizedString" => quote!(String),
@@ -66,6 +67,8 @@ impl RustTypesMapping {
       "duration" => quote!(String),
       "gYear" => quote!(u16),
       "ID" => quote!(String),
+      "IDREF" => quote!(String),
+      "IDREFS" => quote!(String),
       "anyType" => quote!(String),
       _ => {
         println!("Type {:?} not implemented", item);
@@ -78,7 +81,7 @@ impl RustTypesMapping {
     let struct_name = if *items.last().unwrap() == "" {
       "String".to_string()
     } else {
-      (*items.last().unwrap().to_camel_case()).to_string()
+      (*items.last().unwrap().replace(".", "_").to_camel_case()).to_string()
     };
 
     let struct_name = if items.len() == 2 {
@@ -120,9 +123,13 @@ mod tests {
     assert!(RustTypesMapping::get(&context, "xs:long").to_string() == "i64");
     assert!(RustTypesMapping::get(&context, "xs:unsignedLong").to_string() == "u64");
     assert!(RustTypesMapping::get(&context, "xs:nonNegativeInteger").to_string() == "u64");
+    assert!(RustTypesMapping::get(&context, "xs:double").to_string() == "f64");
     assert!(RustTypesMapping::get(&context, "xs:decimal").to_string() == "String");
     assert!(RustTypesMapping::get(&context, "xs:string").to_string() == "String");
     assert!(RustTypesMapping::get(&context, "xs:string").to_string() == "String");
+    assert!(RustTypesMapping::get(&context, "xs:ID").to_string() == "String");
+    assert!(RustTypesMapping::get(&context, "xs:IDREF").to_string() == "String");
+    assert!(RustTypesMapping::get(&context, "xs:IDREFS").to_string() == "String");
 
     assert!(RustTypesMapping::get(&context, "other:type").to_string() == "Type");
   }
