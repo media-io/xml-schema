@@ -1,3 +1,4 @@
+mod annotation;
 mod attribute;
 mod attribute_group;
 mod complex_content;

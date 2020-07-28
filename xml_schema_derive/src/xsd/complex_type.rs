@@ -1,6 +1,6 @@
 use crate::xsd::{
-  attribute::Attribute, complex_content::ComplexContent, sequence::Sequence,
-  simple_content::SimpleContent, XsdContext,
+  annotation::Annotation, attribute::Attribute, complex_content::ComplexContent,
+  sequence::Sequence, simple_content::SimpleContent, XsdContext,
 };
 use heck::CamelCase;
 use log::{debug, info};
@@ -25,6 +25,8 @@ pub struct ComplexType {
   pub simple_content: Option<SimpleContent>,
   #[yaserde(rename = "complexContent")]
   pub complex_content: Option<ComplexContent>,
+  #[yaserde(rename = "annotation")]
+  pub annotation: Option<Annotation>,
 }
 
 impl ComplexType {
@@ -71,7 +73,15 @@ impl ComplexType {
       .map(|sequence| sequence.get_sub_types_implementation(context, &namespace_definition, prefix))
       .unwrap_or_else(|| quote!());
 
+    let docs = self
+      .annotation
+      .as_ref()
+      .map(|annotation| annotation.get_implementation(&namespace_definition, prefix, context))
+      .unwrap_or_else(|| quote!());
+
     quote! {
+      #docs
+
       #[derive(Clone, Debug, Default, PartialEq, YaDeserialize, YaSerialize)]
       #namespace_definition
       pub struct #struct_name {

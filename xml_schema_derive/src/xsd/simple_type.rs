@@ -34,7 +34,7 @@ impl SimpleType {
       #namespace_definition
       pub struct #struct_name {
         #[yaserde(text)]
-        pub content: String,
+        pub content: std::string::String,
       }
     )
   }
@@ -64,11 +64,12 @@ mod tests {
       .get_implementation(&quote!(), &None, &context)
       .to_string();
 
-    assert!(
-      ts == format!(
-        "{}pub struct Test {{ # [ yaserde ( text ) ] pub content : String , }}",
+    assert_eq!(
+      format!(
+        "{}pub struct Test {{ # [ yaserde ( text ) ] pub content : std :: string :: String , }}",
         DERIVES
-      )
+      ),
+      ts
     );
   }
 
