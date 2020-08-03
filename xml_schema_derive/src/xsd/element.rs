@@ -65,7 +65,7 @@ impl Element {
       .annotation
       .as_ref()
       .map(|annotation| annotation.get_implementation(&namespace_definition, prefix, context))
-      .unwrap_or_else(|| quote!());
+      .unwrap_or_else(TokenStream::new);
 
     quote! {
       #docs
@@ -100,10 +100,6 @@ impl Element {
       return quote!();
     }
 
-    // if self.kind == "md:CompObjEntry-type" {
-    //   return quote!();
-    // }
-
     let name = if self.name.to_lowercase() == "type" {
       "Kind".to_string()
     } else {
@@ -117,25 +113,14 @@ impl Element {
     let attribute_name = Ident::new(&name, Span::call_site());
     let yaserde_rename = &self.name;
 
-    let rust_type = if self.complex_type.is_empty() {
-      if let Some(kind) = &self.kind {
-        RustTypesMapping::get(context, kind)
-      } else {
-        panic!(
-          "[Element] {} unimplemented type: {:?}",
-          self.name, self.kind,
-        );
-      }
-    } else if self.complex_type.first().unwrap().sequence.is_some() {
-      let list_wrapper = Ident::new(&self.name, Span::call_site());
-      quote!(#list_wrapper)
-    } else if self.complex_type.first().unwrap().simple_content.is_some() {
-      quote!(String)
+    let rust_type = if let Some(complex_type) = self.complex_type.first() {
+      complex_type.get_integrated_implementation(&self.name)
+    } else if let Some(kind) = &self.kind {
+      RustTypesMapping::get(context, kind)
     } else {
-      println!("{:?}", self);
       panic!(
-        "[Element] {} unimplemented complex type with type: {:?}",
-        self.name, self.kind
+        "[Element] {:?} unimplemented type: {:?}",
+        self.name, self.kind,
       );
     };
 

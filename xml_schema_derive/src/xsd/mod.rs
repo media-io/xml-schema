@@ -61,7 +61,7 @@ impl Xsd {
     };
 
     // skip BOM header, can be present on some files
-    let content = if &content.as_bytes()[0..3] == [0xef, 0xbb, 0xbf] {
+    let content = if content.as_bytes()[0..3] == [0xef, 0xbb, 0xbf] {
       content[3..].to_owned()
     } else {
       content

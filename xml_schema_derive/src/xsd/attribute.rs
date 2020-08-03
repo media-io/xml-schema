@@ -1,4 +1,4 @@
-use crate::xsd::{rust_types_mapping::RustTypesMapping, XsdContext};
+use crate::xsd::{rust_types_mapping::RustTypesMapping, simple_type::SimpleType, XsdContext};
 use log::debug;
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
@@ -24,6 +24,8 @@ pub struct Attribute {
   pub required: Required,
   #[yaserde(rename = "ref", attribute)]
   pub reference: Option<String>,
+  #[yaserde(rename = "simpleType")]
+  pub simple_type: Option<SimpleType>,
 }
 
 #[derive(Clone, Debug, PartialEq, YaDeserialize)]
@@ -50,7 +52,7 @@ impl Attribute {
     let name = if name == "type" {
       "kind".to_string()
     } else {
-      name.clone()
+      name
     };
 
     let field_name = Ident::new(&name, Span::call_site());
@@ -58,7 +60,7 @@ impl Attribute {
     let rust_type = match (self.reference.as_ref(), self.kind.as_ref()) {
       (None, Some(kind)) => RustTypesMapping::get(context, &kind),
       (Some(reference), None) => RustTypesMapping::get(context, &reference),
-      (_, _) => unimplemented!(),
+      (_, _) => panic!("Not implemented Rust type for: {:?}", self),
     };
 
     let rust_type = if self.required == Required::Optional {
@@ -85,6 +87,7 @@ mod tests {
       kind: Some("xs:string".to_string()),
       reference: None,
       required: Required::Required,
+      simple_type: None,
     };
 
     let context =
@@ -105,6 +108,7 @@ mod tests {
       kind: Some("xs:string".to_string()),
       reference: None,
       required: Required::Optional,
+      simple_type: None,
     };
 
     let context =
@@ -125,6 +129,7 @@ mod tests {
       kind: Some("xs:string".to_string()),
       reference: None,
       required: Required::Optional,
+      simple_type: None,
     };
 
     let context =

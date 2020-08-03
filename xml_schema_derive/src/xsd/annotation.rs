@@ -26,20 +26,17 @@ pub struct Annotation {
 impl Annotation {
   pub fn get_implementation(
     &self,
-    namespace_definition: &TokenStream,
-    prefix: &Option<String>,
-    context: &XsdContext,
+    _namespace_definition: &TokenStream,
+    _prefix: &Option<String>,
+    _context: &XsdContext,
   ) -> TokenStream {
     info!("Generate annotation");
 
-    let documentation = self.documentation.iter().map(|documentation| {
-      quote! {
-        #[doc = #documentation]
-      }
-    });
+    let documentation = self
+      .documentation
+      .iter()
+      .map(|documentation| quote!(#[doc = #documentation]));
 
-    quote! {
-      #(#documentation)*
-    }
+    quote!(#(#documentation)*)
   }
 }

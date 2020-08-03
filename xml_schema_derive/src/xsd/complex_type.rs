@@ -45,14 +45,14 @@ impl ComplexType {
       .sequence
       .as_ref()
       .map(|sequence| sequence.get_implementation(context, prefix))
-      .unwrap_or_else(|| quote!());
+      .unwrap_or_else(TokenStream::new);
 
     info!("Generate simple content");
     let simple_content = self
       .simple_content
       .as_ref()
       .map(|simple_content| simple_content.get_implementation(context))
-      .unwrap_or_else(|| quote!());
+      .unwrap_or_else(TokenStream::new);
 
     let namespace_definition = if self.name == "AssetType" {
       quote!(#[yaserde(root= "Asset", prefix = "am", namespace="am: http://www.smpte-ra.org/schemas/429-9/2007/AM")])
@@ -74,13 +74,13 @@ impl ComplexType {
       .sequence
       .as_ref()
       .map(|sequence| sequence.get_sub_types_implementation(context, &namespace_definition, prefix))
-      .unwrap_or_else(|| quote!());
+      .unwrap_or_else(TokenStream::new);
 
     let docs = self
       .annotation
       .as_ref()
       .map(|annotation| annotation.get_implementation(&namespace_definition, prefix, context))
-      .unwrap_or_else(|| quote!());
+      .unwrap_or_else(TokenStream::new);
 
     quote! {
       #docs
@@ -106,6 +106,23 @@ impl ComplexType {
       .sequence
       .as_ref()
       .map(|sequence| sequence.get_field_implementation(context, prefix))
-      .unwrap_or_else(|| quote!())
+      .unwrap_or_else(TokenStream::new)
+  }
+
+  pub fn get_integrated_implementation(&self, parent_name: &str) -> TokenStream {
+    if self.simple_content.is_some() {
+      return quote!(String);
+    }
+
+    if self.sequence.is_some() {
+      let list_wrapper = Ident::new(parent_name, Span::call_site());
+      return quote!(#list_wrapper);
+    }
+
+    quote!(String)
+    // println!("{:?}", self);
+    // panic!(
+    //   "[Complex Type] Unimplemented complex type for parent element {:?}", parent_name
+    // );
   }
 }
