@@ -49,4 +49,4 @@ Remark: the `MySchema` don't need to be public. It serve just as support of info
 **source**: Source of the XSD - XML Schema. It can be local file (related to the root of the project) or an HTTP resource.  
 **target_prefix**: The schema not define any prefix. It the `targetNamespace` is declared in the schema, this attribute is required.  
 **store_generated_code**: Optional attribute for debug purpose. It store the generated Rust code into the file - the attribute value is the output filename.  
-**log_level**: To configure the logger level at the the compile time - usefull if the XSD generate some bugs. Values can be "error", "warn", "info", "debug", "trace".  
+**log_level**: To configure the logger level at the the compile time - usefull if the XSD generate some bugs. Values can be `error`, `warn`, `info`, `debug`, `trace`.  
