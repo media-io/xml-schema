@@ -36,7 +36,10 @@ impl ComplexType {
     prefix: &Option<String>,
     context: &XsdContext,
   ) -> TokenStream {
-    let struct_name = Ident::new(&self.name.replace(".", "_").to_camel_case(), Span::call_site());
+    let struct_name = Ident::new(
+      &self.name.replace(".", "_").to_camel_case(),
+      Span::call_site(),
+    );
     info!("Generate sequence");
     let sequence = self
       .sequence

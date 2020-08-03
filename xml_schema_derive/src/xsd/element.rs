@@ -132,7 +132,7 @@ impl Element {
     } else if self.complex_type.first().unwrap().simple_content.is_some() {
       quote!(String)
     } else {
-        println!("{:?}", self);
+      println!("{:?}", self);
       panic!(
         "[Element] {} unimplemented complex type with type: {:?}",
         self.name, self.kind
