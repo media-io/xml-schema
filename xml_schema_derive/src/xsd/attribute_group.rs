@@ -18,11 +18,3 @@ pub struct AttributeGroup {
   // #[yaserde(rename = "attributeGroup")]
   // pub attribute_group: Vec<AttributeGroup>,
 }
-
-impl AttributeGroup {}
-
-// #[cfg(test)]
-// mod tests {
-//   use super::*;
-
-// }

@@ -1,6 +1,6 @@
 use crate::xsd::{
   annotation::Annotation, attribute::Attribute, complex_content::ComplexContent,
-  sequence::Sequence, simple_content::SimpleContent, XsdContext,
+  sequence::Sequence, simple_content::SimpleContent, Implementation, XsdContext,
 };
 use heck::CamelCase;
 use log::{debug, info};
@@ -29,8 +29,8 @@ pub struct ComplexType {
   pub annotation: Option<Annotation>,
 }
 
-impl ComplexType {
-  pub fn get_implementation(
+impl Implementation for ComplexType {
+  fn implement(
     &self,
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
@@ -44,14 +44,14 @@ impl ComplexType {
     let sequence = self
       .sequence
       .as_ref()
-      .map(|sequence| sequence.get_implementation(context, prefix))
+      .map(|sequence| sequence.implement(namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
     info!("Generate simple content");
     let simple_content = self
       .simple_content
       .as_ref()
-      .map(|simple_content| simple_content.get_implementation(context))
+      .map(|simple_content| simple_content.implement(namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
     let namespace_definition = if self.name == "AssetType" {
@@ -67,7 +67,7 @@ impl ComplexType {
     let attributes: TokenStream = self
       .attributes
       .iter()
-      .map(|attribute| attribute.get_implementation(context))
+      .map(|attribute| attribute.implement(&namespace_definition, prefix, context))
       .collect();
 
     let sub_types_implementation = self
@@ -79,7 +79,7 @@ impl ComplexType {
     let docs = self
       .annotation
       .as_ref()
-      .map(|annotation| annotation.get_implementation(&namespace_definition, prefix, context))
+      .map(|annotation| annotation.implement(&namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
     quote! {
@@ -96,7 +96,9 @@ impl ComplexType {
       #sub_types_implementation
     }
   }
+}
 
+impl ComplexType {
   pub fn get_field_implementation(
     &self,
     prefix: &Option<String>,

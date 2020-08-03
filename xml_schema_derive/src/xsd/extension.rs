@@ -1,5 +1,6 @@
 use crate::xsd::{
-  attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence, XsdContext,
+  attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence, Implementation,
+  XsdContext,
 };
 use log::debug;
 use proc_macro2::TokenStream;
@@ -21,14 +22,19 @@ pub struct Extension {
   pub sequences: Vec<Sequence>,
 }
 
-impl Extension {
-  pub fn get_implementation(&self, context: &XsdContext) -> TokenStream {
+impl Implementation for Extension {
+  fn implement(
+    &self,
+    namespace_definition: &TokenStream,
+    prefix: &Option<String>,
+    context: &XsdContext,
+  ) -> TokenStream {
     let rust_type = RustTypesMapping::get(context, &self.base);
 
     let attributes: TokenStream = self
       .attributes
       .iter()
-      .map(|attribute| attribute.get_implementation(context))
+      .map(|attribute| attribute.implement(&namespace_definition, prefix, context))
       .collect();
 
     let inner_attribute = if format!("{}", rust_type) == "String" {
@@ -61,7 +67,9 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = st.get_implementation(&context).to_string();
+    let ts = st
+      .implement(&TokenStream::new(), &None, &context)
+      .to_string();
     assert!(ts == "# [ yaserde ( text ) ] pub content : String ,");
   }
 
@@ -94,7 +102,9 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = st.get_implementation(&context).to_string();
+    let ts = st
+      .implement(&TokenStream::new(), &None, &context)
+      .to_string();
     assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] pub attribute_1 : String , # [ yaserde ( attribute ) ] pub attribute_2 : Option < bool > ,");
   }
 }

@@ -1,5 +1,6 @@
 use crate::xsd::{
-  attribute, attribute_group, complex_type, element, import, qualification, simple_type, XsdContext,
+  attribute, attribute_group, complex_type, element, import, qualification, simple_type,
+  Implementation, XsdContext,
 };
 use log::{debug, info};
 use proc_macro2::TokenStream;
@@ -33,9 +34,10 @@ pub struct Schema {
   pub attribute_group: Vec<attribute_group::AttributeGroup>,
 }
 
-impl Schema {
-  pub fn get_implementation(
+impl Implementation for Schema {
+  fn implement(
     &self,
+    _namespace_definition: &TokenStream,
     target_prefix: &Option<String>,
     context: &XsdContext,
   ) -> TokenStream {
@@ -54,25 +56,21 @@ impl Schema {
     let elements: TokenStream = self
       .elements
       .iter()
-      .map(|element| element.get_implementation(&namespace_definition, target_prefix, context))
+      .map(|element| element.implement(&namespace_definition, target_prefix, context))
       .collect();
 
     info!("Generate simple types");
     let simple_types: TokenStream = self
       .simple_type
       .iter()
-      .map(|simple_type| {
-        simple_type.get_implementation(&namespace_definition, target_prefix, context)
-      })
+      .map(|simple_type| simple_type.implement(&namespace_definition, target_prefix, context))
       .collect();
 
     info!("Generate complex types");
     let complex_types: TokenStream = self
       .complex_type
       .iter()
-      .map(|complex_type| {
-        complex_type.get_implementation(&namespace_definition, target_prefix, context)
-      })
+      .map(|complex_type| complex_type.implement(&namespace_definition, target_prefix, context))
       .collect();
 
     quote!(

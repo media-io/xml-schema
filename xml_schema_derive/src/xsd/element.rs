@@ -1,6 +1,6 @@
 use crate::xsd::{
   annotation::Annotation, complex_type::ComplexType, max_occurences::MaxOccurences,
-  rust_types_mapping::RustTypesMapping, XsdContext,
+  rust_types_mapping::RustTypesMapping, Implementation, XsdContext,
 };
 use heck::{CamelCase, SnakeCase};
 use log::{debug, info};
@@ -28,8 +28,8 @@ pub struct Element {
   pub annotation: Option<Annotation>,
 }
 
-impl Element {
-  pub fn get_implementation(
+impl Implementation for Element {
+  fn implement(
     &self,
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
@@ -64,7 +64,7 @@ impl Element {
     let docs = self
       .annotation
       .as_ref()
-      .map(|annotation| annotation.get_implementation(&namespace_definition, prefix, context))
+      .map(|annotation| annotation.implement(&namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
     quote! {
@@ -76,7 +76,9 @@ impl Element {
       }
     }
   }
+}
 
+impl Element {
   pub fn get_subtypes_implementation(
     &self,
     namespace_definition: &TokenStream,
@@ -87,7 +89,7 @@ impl Element {
       return quote!();
     }
 
-    self.get_implementation(namespace_definition, prefix, context)
+    self.implement(namespace_definition, prefix, context)
   }
 
   pub fn get_field_implementation(
@@ -172,7 +174,7 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = element.get_implementation(&quote!(), &None, &context);
+    let ts = element.implement(&quote!(), &None, &context);
 
     assert_eq!(
       ts.to_string(),
@@ -203,7 +205,7 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = element.get_implementation(&quote!(), &None, &context);
+    let ts = element.implement(&quote!(), &None, &context);
 
     assert_eq!(
       ts.to_string(),

@@ -1,4 +1,4 @@
-use crate::xsd::{list::List, restriction::Restriction, union::Union, XsdContext};
+use crate::xsd::{list::List, restriction::Restriction, union::Union, Implementation, XsdContext};
 use heck::CamelCase;
 use log::debug;
 use proc_macro2::{Span, TokenStream};
@@ -16,8 +16,8 @@ pub struct SimpleType {
   pub union: Option<Union>,
 }
 
-impl SimpleType {
-  pub fn get_implementation(
+impl Implementation for SimpleType {
+  fn implement(
     &self,
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
@@ -26,7 +26,7 @@ impl SimpleType {
     let struct_name = Ident::new(&self.name.to_camel_case(), Span::call_site());
 
     if let Some(list) = &self.list {
-      return list.get_implementation(context, namespace_definition, prefix, &struct_name);
+      return list.implement_childs(namespace_definition, prefix, context, &struct_name);
     }
 
     quote!(
@@ -60,9 +60,7 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = st
-      .get_implementation(&quote!(), &None, &context)
-      .to_string();
+    let ts = st.implement(&quote!(), &None, &context).to_string();
 
     assert_eq!(
       format!(

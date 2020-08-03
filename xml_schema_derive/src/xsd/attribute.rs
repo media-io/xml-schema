@@ -1,4 +1,6 @@
-use crate::xsd::{rust_types_mapping::RustTypesMapping, simple_type::SimpleType, XsdContext};
+use crate::xsd::{
+  rust_types_mapping::RustTypesMapping, simple_type::SimpleType, Implementation, XsdContext,
+};
 use log::debug;
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
@@ -42,8 +44,13 @@ impl Default for Required {
   }
 }
 
-impl Attribute {
-  pub fn get_implementation(&self, context: &XsdContext) -> TokenStream {
+impl Implementation for Attribute {
+  fn implement(
+    &self,
+    _namespace_definition: &TokenStream,
+    _prefix: &Option<String>,
+    context: &XsdContext,
+  ) -> TokenStream {
     if self.name.is_none() {
       return quote!();
     }
@@ -94,7 +101,10 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = format!("{}", attribute.get_implementation(&context));
+    let implementation = format!(
+      "{}",
+      attribute.implement(&TokenStream::new(), &None, &context)
+    );
     assert_eq!(
       implementation,
       "# [ yaserde ( attribute ) ] pub language : String ,".to_string()
@@ -115,7 +125,10 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = format!("{}", attribute.get_implementation(&context));
+    let implementation = format!(
+      "{}",
+      attribute.implement(&TokenStream::new(), &None, &context)
+    );
     assert_eq!(
       implementation,
       "# [ yaserde ( attribute ) ] pub language : Option < String > ,".to_string()
@@ -136,7 +149,10 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = format!("{}", attribute.get_implementation(&context));
+    let implementation = format!(
+      "{}",
+      attribute.implement(&TokenStream::new(), &None, &context)
+    );
     assert_eq!(
       implementation,
       "# [ yaserde ( attribute ) ] pub kind : Option < String > ,".to_string()

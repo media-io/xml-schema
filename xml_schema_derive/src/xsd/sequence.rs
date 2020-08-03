@@ -1,4 +1,4 @@
-use crate::xsd::{element::Element, XsdContext};
+use crate::xsd::{element::Element, Implementation, XsdContext};
 use log::{debug, info};
 use proc_macro2::TokenStream;
 use std::io::prelude::*;
@@ -11,8 +11,13 @@ pub struct Sequence {
   pub elements: Vec<Element>,
 }
 
-impl Sequence {
-  pub fn get_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
+impl Implementation for Sequence {
+  fn implement(
+    &self,
+    _namespace_definition: &TokenStream,
+    prefix: &Option<String>,
+    context: &XsdContext,
+  ) -> TokenStream {
     info!("Generate elements");
     self
       .elements
@@ -20,7 +25,9 @@ impl Sequence {
       .map(|element| element.get_field_implementation(context, prefix, false))
       .collect()
   }
+}
 
+impl Sequence {
   pub fn get_sub_types_implementation(
     &self,
     context: &XsdContext,

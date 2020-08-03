@@ -1,4 +1,4 @@
-use crate::xsd::{rust_types_mapping::RustTypesMapping, XsdContext};
+use crate::xsd::{rust_types_mapping::RustTypesMapping, Implementation, XsdContext};
 use log::debug;
 use proc_macro2::{Ident, TokenStream};
 use std::io::prelude::*;
@@ -11,12 +11,12 @@ pub struct List {
   pub item_type: String,
 }
 
-impl List {
-  pub fn get_implementation(
+impl Implementation for List {
+  fn implement_childs(
     &self,
-    context: &XsdContext,
     _namespace_definition: &TokenStream,
     _prefix: &Option<String>,
+    context: &XsdContext,
     struct_name: &Ident,
   ) -> TokenStream {
     let list_type = RustTypesMapping::get(context, &self.item_type);

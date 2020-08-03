@@ -1,4 +1,4 @@
-use crate::xsd::{attribute::Attribute, XsdContext};
+use crate::xsd::{attribute::Attribute, Implementation, XsdContext};
 use log::info;
 use proc_macro2::TokenStream;
 use std::io::prelude::*;
@@ -23,8 +23,8 @@ pub struct Annotation {
   pub documentation: Vec<String>,
 }
 
-impl Annotation {
-  pub fn get_implementation(
+impl Implementation for Annotation {
+  fn implement(
     &self,
     _namespace_definition: &TokenStream,
     _prefix: &Option<String>,

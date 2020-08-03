@@ -19,11 +19,32 @@ mod union;
 mod xsd_context;
 
 use log::info;
-use proc_macro2::TokenStream;
+use proc_macro2::{Ident, TokenStream};
 use std::collections::BTreeMap;
 use std::fs;
 use xsd_context::XsdContext;
 use yaserde::de::from_str;
+
+trait Implementation {
+  fn implement(
+    &self,
+    _namespace_definition: &TokenStream,
+    _prefix: &Option<String>,
+    _context: &XsdContext,
+  ) -> TokenStream {
+    unimplemented!()
+  }
+
+  fn implement_childs(
+    &self,
+    _namespace_definition: &TokenStream,
+    _prefix: &Option<String>,
+    _context: &XsdContext,
+    _struct_name: &Ident,
+  ) -> TokenStream {
+    unimplemented!()
+  }
+}
 
 #[derive(Clone, Debug)]
 pub struct Xsd {
@@ -70,7 +91,9 @@ impl Xsd {
     Xsd::new(&content, module_namespace_mappings)
   }
 
-  pub fn get_implementation(&self, target_prefix: &Option<String>) -> TokenStream {
-    self.schema.get_implementation(target_prefix, &self.context)
+  pub fn implement(&self, target_prefix: &Option<String>) -> TokenStream {
+    self
+      .schema
+      .implement(&TokenStream::new(), target_prefix, &self.context)
   }
 }
