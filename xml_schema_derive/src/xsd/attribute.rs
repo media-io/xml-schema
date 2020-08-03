@@ -55,16 +55,11 @@ impl Attribute {
 
     let field_name = Ident::new(&name, Span::call_site());
 
-    let rust_type = 
-      match (self.reference.as_ref(), self.kind.as_ref()) {
-        (None, Some(kind)) => {
-          RustTypesMapping::get(context, &kind)
-        }
-        (Some(reference), None) => {
-          RustTypesMapping::get(context, &reference)
-        }
-        (_, _) => unimplemented!()
-      };
+    let rust_type = match (self.reference.as_ref(), self.kind.as_ref()) {
+      (None, Some(kind)) => RustTypesMapping::get(context, &kind),
+      (Some(reference), None) => RustTypesMapping::get(context, &reference),
+      (_, _) => unimplemented!(),
+    };
 
     let rust_type = if self.required == Required::Optional {
       quote!(Option<#rust_type>)

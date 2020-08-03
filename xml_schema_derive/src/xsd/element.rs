@@ -1,6 +1,6 @@
 use crate::xsd::{
-  complex_type::ComplexType, max_occurences::MaxOccurences, rust_types_mapping::RustTypesMapping,
-  XsdContext,
+  annotation::Annotation, complex_type::ComplexType, max_occurences::MaxOccurences,
+  rust_types_mapping::RustTypesMapping, XsdContext,
 };
 use heck::{CamelCase, SnakeCase};
 use log::{debug, info};
@@ -24,6 +24,8 @@ pub struct Element {
   pub max_occurences: Option<MaxOccurences>,
   #[yaserde(rename = "complexType")]
   pub complex_type: Vec<ComplexType>,
+  #[yaserde(rename = "annotation")]
+  pub annotation: Option<Annotation>,
 }
 
 impl Element {
@@ -59,7 +61,14 @@ impl Element {
         .collect()
     };
 
+    let docs = self
+      .annotation
+      .as_ref()
+      .map(|annotation| annotation.get_implementation(&namespace_definition, prefix, context))
+      .unwrap_or_else(|| quote!());
+
     quote! {
+      #docs
       #[derive(Clone, Debug, Default, PartialEq, YaDeserialize, YaSerialize)]
       #namespace_definition
       pub struct #struct_name {
@@ -123,7 +132,7 @@ impl Element {
     } else if self.complex_type.first().unwrap().simple_content.is_some() {
       quote!(String)
     } else {
-        println!("{:?}", self);
+      println!("{:?}", self);
       panic!(
         "[Element] {} unimplemented complex type with type: {:?}",
         self.name, self.kind
@@ -156,6 +165,8 @@ mod tests {
   static DERIVES: &str =
     "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] ";
 
+  static DOCS: &str = r#"# [ doc = "Loudness measured in Decibels" ] "#;
+
   #[test]
   fn extern_type() {
     let element = Element {
@@ -165,6 +176,11 @@ mod tests {
       min_occurences: None,
       max_occurences: None,
       complex_type: vec![],
+      annotation: Some(Annotation {
+        id: None,
+        attributes: vec![],
+        documentation: vec!["Loudness measured in Decibels".to_string()],
+      }),
     };
 
     let context =
@@ -176,8 +192,8 @@ mod tests {
     assert_eq!(
       ts.to_string(),
       format!(
-        "{}pub struct Volume {{ # [ yaserde ( flatten ) ] pub content : VolumeType , }}",
-        DERIVES
+        "{}{}pub struct Volume {{ # [ yaserde ( flatten ) ] pub content : VolumeType , }}",
+        DOCS, DERIVES
       )
     );
   }
@@ -191,6 +207,11 @@ mod tests {
       min_occurences: None,
       max_occurences: None,
       complex_type: vec![],
+      annotation: Some(Annotation {
+        id: None,
+        attributes: vec![],
+        documentation: vec!["Loudness measured in Decibels".to_string()],
+      }),
     };
 
     let context =
@@ -202,8 +223,8 @@ mod tests {
     assert_eq!(
       ts.to_string(),
       format!(
-        "{}pub struct Volume {{ # [ yaserde ( text ) ] pub content : String , }}",
-        DERIVES
+        "{}{}pub struct Volume {{ # [ yaserde ( text ) ] pub content : String , }}",
+        DOCS, DERIVES
       )
     );
   }

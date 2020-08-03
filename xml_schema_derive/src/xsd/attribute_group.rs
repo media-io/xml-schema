@@ -19,8 +19,7 @@ pub struct AttributeGroup {
   // pub attribute_group: Vec<AttributeGroup>,
 }
 
-impl AttributeGroup {
-}
+impl AttributeGroup {}
 
 // #[cfg(test)]
 // mod tests {

@@ -1,3 +1,4 @@
+mod annotation;
 mod attribute;
 mod attribute_group;
 mod complex_content;
@@ -60,12 +61,11 @@ impl Xsd {
     };
 
     // skip BOM header, can be present on some files
-    let content =
-      if &content.as_bytes()[0..3] == [0xef, 0xbb, 0xbf] {
-        content[3..].to_owned()
-      } else {
-        content
-      };
+    let content = if &content.as_bytes()[0..3] == [0xef, 0xbb, 0xbf] {
+      content[3..].to_owned()
+    } else {
+      content
+    };
 
     Xsd::new(&content, module_namespace_mappings)
   }

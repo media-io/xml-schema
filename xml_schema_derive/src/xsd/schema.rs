@@ -1,4 +1,6 @@
-use crate::xsd::{attribute, attribute_group, complex_type, element, import, qualification, simple_type, XsdContext};
+use crate::xsd::{
+  attribute, attribute_group, complex_type, element, import, qualification, simple_type, XsdContext,
+};
 use log::{debug, info};
 use proc_macro2::TokenStream;
 use std::io::prelude::*;
