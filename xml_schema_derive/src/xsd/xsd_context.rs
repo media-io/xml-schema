@@ -23,16 +23,17 @@ impl XsdContext {
           if name.namespace == Some("http://www.w3.org/2001/XMLSchema".to_string())
             && name.local_name == "schema"
           {
+            let module_namespace_mappings = BTreeMap::new();
+            let xml_schema_prefix = name.prefix;
+
             return Ok(XsdContext {
-              module_namespace_mappings: BTreeMap::new(),
+              module_namespace_mappings,
               namespace,
-              xml_schema_prefix: name.prefix,
+              xml_schema_prefix,
             });
           }
         }
-        Err(_) => {
-          break;
-        }
+        Err(_) => break,
         _ => {}
       }
     }
@@ -68,4 +69,45 @@ impl XsdContext {
       })
       .unwrap_or_else(|| None)
   }
+}
+
+#[test]
+fn get_module() {
+  let context = XsdContext::new(
+    r#"
+    <xs:schema
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:example="http://example.com"
+      >
+    </xs:schema>
+  "#,
+  )
+  .unwrap();
+
+  let mut mapping = BTreeMap::new();
+  mapping.insert(
+    "http://example.com".to_string(),
+    "crate::example".to_string(),
+  );
+  let context = context.with_module_namespace_mappings(&mapping);
+
+  assert_eq!(
+    context.get_module("example"),
+    Some("crate::example".to_string())
+  );
+  assert_eq!(context.get_module("other"), None);
+}
+
+#[test]
+fn bad_schema_definition() {
+  let context = XsdContext::new(
+    r#"
+    <xs:schema
+      xmlns="http://www.w3.org/2001/XMLSchema"
+      >
+    </xs:schema>
+  "#,
+  );
+
+  assert!(context.is_err());
 }

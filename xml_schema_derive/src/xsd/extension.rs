@@ -34,7 +34,7 @@ impl Extension {
     let inner_attribute = if format!("{}", rust_type) == "String" {
       quote!(#[yaserde(text)])
     } else {
-      quote!()
+      TokenStream::new()
     };
 
     quote!(

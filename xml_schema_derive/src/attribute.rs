@@ -18,10 +18,10 @@ fn get_value(iter: &mut IntoIter) -> Option<String> {
     if operator.as_char() == '=' {
       Some(value.to_string().replace("\"", ""))
     } else {
-      None
+      panic!("Missing `=` operator");
     }
   } else {
-    None
+    panic!("Missing items to get the associated value");
   }
 }
 
@@ -72,15 +72,11 @@ impl XmlSchemaAttribute {
                         "info" => log::Level::Info,
                         "warn" => log::Level::Warn,
                         "error" => log::Level::Error,
-                        _ => {
-                          panic!("Bad log level: {}", value);
-                        }
+                        _ => panic!("Bad log level: {}", value),
                       };
                     }
                   }
-                  _ => {
-                    panic!("Bad XmlSchema attribute: {}", ident.to_string());
-                  }
+                  _ => panic!("Bad XmlSchema attribute: {}", ident.to_string()),
                 }
               }
             }
@@ -217,6 +213,34 @@ mod tests {
   }
 
   #[test]
+  fn parse_module_namespace_mapping() {
+    let attributes = generate_attributes(
+      r#"(
+      source = "schema.xsd",
+      module_namespace_mapping="http://example.com: crate::example",
+      module_namespace_mapping="crate::base"
+    )"#,
+    );
+    let mut mapping = BTreeMap::new();
+    mapping.insert(
+      "http://example.com".to_string(),
+      "crate::example".to_string(),
+    );
+    mapping.insert("".to_string(), "crate::base".to_string());
+
+    assert_eq!(
+      XmlSchemaAttribute {
+        log_level: log::Level::Warn,
+        module_namespace_mappings: mapping,
+        source: "schema.xsd".to_string(),
+        store_generated_code: None,
+        target_prefix: None,
+      },
+      XmlSchemaAttribute::parse(&attributes)
+    );
+  }
+
+  #[test]
   #[should_panic]
   fn parse_bad_log_level() {
     let attributes = generate_attributes(r#"(source = "schema.xsd", log_level="quiet")"#);
@@ -228,7 +252,20 @@ mod tests {
   #[should_panic]
   fn parse_bad_attribute() {
     let attributes = generate_attributes(r#"(source = "schema.xsd", bad-key="bad_value")"#);
+    XmlSchemaAttribute::parse(&attributes);
+  }
 
+  #[test]
+  #[should_panic]
+  fn parse_missing_value() {
+    let attributes = generate_attributes(r#"(source = "schema.xsd", log_level)"#);
+    XmlSchemaAttribute::parse(&attributes);
+  }
+
+  #[test]
+  #[should_panic]
+  fn parse_bad_association() {
+    let attributes = generate_attributes(r#"(source = "schema.xsd", log_level + "debug")"#);
     XmlSchemaAttribute::parse(&attributes);
   }
 }

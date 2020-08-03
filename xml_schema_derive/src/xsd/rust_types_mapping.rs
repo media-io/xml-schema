@@ -70,10 +70,7 @@ impl RustTypesMapping {
       "IDREF" => quote!(String),
       "IDREFS" => quote!(String),
       "anyType" => quote!(String),
-      _ => {
-        println!("Type {:?} not implemented", item);
-        unimplemented!()
-      }
+      _ => panic!("Type {:?} not implemented", item),
     }
   }
 
@@ -84,17 +81,23 @@ impl RustTypesMapping {
       (*items.last().unwrap().replace(".", "_").to_camel_case()).to_string()
     };
 
-    let struct_name = if items.len() == 2 {
+    let default_module = context
+      .get_module("")
+      .map(|module| format!("{}::", module))
+      .unwrap_or_else(|| "".to_string());
+
+    let module = if items.len() == 2 {
       let prefix = items.first().unwrap();
       if let Some(module) = context.get_module(&prefix) {
-        format!("{}::{}", module, struct_name)
+        module + "::"
       } else {
-        struct_name
+        default_module
       }
     } else {
-      struct_name
+      default_module
     };
 
+    let struct_name = format!("{}{}", module, struct_name);
     let struct_name = parse_str::<TypePath>(&struct_name).unwrap();
     quote!(#struct_name)
   }
@@ -130,13 +133,39 @@ mod tests {
     assert!(RustTypesMapping::get(&context, "xs:ID").to_string() == "String");
     assert!(RustTypesMapping::get(&context, "xs:IDREF").to_string() == "String");
     assert!(RustTypesMapping::get(&context, "xs:IDREFS").to_string() == "String");
+    assert!(RustTypesMapping::get(&context, "xs:anyType").to_string() == "String");
 
     assert!(RustTypesMapping::get(&context, "other:type").to_string() == "Type");
+
+    let context =
+      XsdContext::new(r#"<schema xmlns="http://www.w3.org/2001/XMLSchema"></schema>"#).unwrap();
+
+    assert!(RustTypesMapping::get(&context, "boolean").to_string() == "bool");
+  }
+
+  #[test]
+  #[should_panic]
+  fn rust_bad_mapping_type() {
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
+
+    RustTypesMapping::get(&context, "xs:unknown");
   }
 
   #[test]
   fn extern_types() {
-    let context = XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:example="http://example.com"></xs:schema>"#).unwrap();
+    let context = XsdContext::new(
+      r#"
+      <xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:example="http://example.com"
+        >
+      </xs:schema>
+    "#,
+    )
+    .unwrap();
+
     let mut mapping = BTreeMap::new();
     mapping.insert(
       "http://example.com".to_string(),
@@ -144,13 +173,79 @@ mod tests {
     );
 
     let context = context.with_module_namespace_mappings(&mapping);
-    assert!(
-      RustTypesMapping::get(&context, "example:MyType").to_string()
-        == "rust_example_module :: MyType"
+    assert_eq!(
+      RustTypesMapping::get(&context, "example:MyType").to_string(),
+      "rust_example_module :: MyType"
     );
 
-    assert!(
-      RustTypesMapping::get(&context, "example:").to_string() == "rust_example_module :: String"
+    assert_eq!(
+      RustTypesMapping::get(&context, "example:").to_string(),
+      "rust_example_module :: String"
+    );
+  }
+
+  #[test]
+  fn extern_types_in_default_namespace() {
+    let context = XsdContext::new(
+      r#"
+      <xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://example.com"
+        >
+      </xs:schema>
+    "#,
+    )
+    .unwrap();
+
+    let mut mapping = BTreeMap::new();
+    mapping.insert(
+      "http://example.com".to_string(),
+      "rust_example_module".to_string(),
+    );
+
+    let context = context.with_module_namespace_mappings(&mapping);
+    assert_eq!(
+      RustTypesMapping::get(&context, "MyType").to_string(),
+      "rust_example_module :: MyType"
+    );
+
+    assert_eq!(
+      RustTypesMapping::get(&context, "").to_string(),
+      "rust_example_module :: String"
+    );
+  }
+
+  #[test]
+  fn is_xs_string() {
+    let context = XsdContext::new(
+      r#"
+      <xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://example.com"
+        >
+      </xs:schema>
+    "#,
+    )
+    .unwrap();
+
+    assert_eq!(RustTypesMapping::is_xs_string(&context, "xs:string"), true);
+    assert_eq!(RustTypesMapping::is_xs_string(&context, "MyType"), false);
+
+    let context = XsdContext::new(
+      r#"
+      <schema
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:example="http://example.com"
+        >
+      </schema>
+    "#,
+    )
+    .unwrap();
+
+    assert_eq!(RustTypesMapping::is_xs_string(&context, "string"), true);
+    assert_eq!(
+      RustTypesMapping::is_xs_string(&context, "example:MyType"),
+      false
     );
   }
 }
