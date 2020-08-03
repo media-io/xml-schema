@@ -50,3 +50,5 @@ Remark: the `MySchema` don't need to be public. It serve just as support of info
 **target_prefix**: The schema not define any prefix. It the `targetNamespace` is declared in the schema, this attribute is required.  
 **store_generated_code**: Optional attribute for debug purpose. It store the generated Rust code into the file - the attribute value is the output filename.  
 **log_level**: To configure the logger level at the the compile time - usefull if the XSD generate some bugs. Values can be `error`, `warn`, `info`, `debug`, `trace`.  
+**module_namespace_mapping**: map a namespace to a Rust module. It can be present many times to map multiple namespaces to different Rust modules.  
+
