@@ -48,7 +48,7 @@ impl Implementation for Attribute {
   fn implement(
     &self,
     _namespace_definition: &TokenStream,
-    _prefix: &Option<String>,
+    prefix: &Option<String>,
     context: &XsdContext,
   ) -> TokenStream {
     if self.name.is_none() {
@@ -64,10 +64,15 @@ impl Implementation for Attribute {
 
     let field_name = Ident::new(&name, Span::call_site());
 
-    let rust_type = match (self.reference.as_ref(), self.kind.as_ref()) {
-      (None, Some(kind)) => RustTypesMapping::get(context, &kind),
-      (Some(reference), None) => RustTypesMapping::get(context, &reference),
-      (_, _) => panic!("Not implemented Rust type for: {:?}", self),
+    let rust_type = match (
+      self.reference.as_ref(),
+      self.kind.as_ref(),
+      self.simple_type.as_ref(),
+    ) {
+      (None, Some(kind), None) => RustTypesMapping::get(context, &kind),
+      (Some(reference), None, None) => RustTypesMapping::get(context, &reference),
+      (None, None, Some(simple_type)) => simple_type.get_type_implementation(context, prefix),
+      (_, _, _) => panic!("Not implemented Rust type for: {:?}", self),
     };
 
     let rust_type = if self.required == Required::Optional {
@@ -86,6 +91,11 @@ impl Implementation for Attribute {
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  fn default_required() {
+    assert_eq!(Required::default(), Required::Optional);
+  }
 
   #[test]
   fn string_attribute() {
@@ -157,5 +167,68 @@ mod tests {
       implementation,
       "# [ yaserde ( attribute ) ] pub kind : Option < String > ,".to_string()
     );
+  }
+
+  #[test]
+  fn reference_type_attribute() {
+    let attribute = Attribute {
+      name: Some("type".to_string()),
+      kind: None,
+      reference: Some("MyType".to_string()),
+      required: Required::Optional,
+      simple_type: None,
+    };
+
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
+
+    let implementation = format!(
+      "{}",
+      attribute.implement(&TokenStream::new(), &None, &context)
+    );
+    assert_eq!(
+      implementation,
+      "# [ yaserde ( attribute ) ] pub kind : Option < MyType > ,".to_string()
+    );
+  }
+
+  #[test]
+  #[should_panic]
+  fn bad_type_attribute() {
+    let attribute = Attribute {
+      name: Some("type".to_string()),
+      kind: None,
+      reference: None,
+      required: Required::Optional,
+      simple_type: None,
+    };
+
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
+
+    attribute.implement(&TokenStream::new(), &None, &context);
+  }
+
+  #[test]
+  fn attribute_without_name() {
+    let attribute = Attribute {
+      name: None,
+      kind: Some("xs:string".to_string()),
+      reference: None,
+      required: Required::Optional,
+      simple_type: None,
+    };
+
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
+
+    let implementation = format!(
+      "{}",
+      attribute.implement(&TokenStream::new(), &None, &context)
+    );
+    assert_eq!(implementation, "".to_string());
   }
 }

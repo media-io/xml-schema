@@ -15,3 +15,12 @@ impl Default for Qualification {
     Qualification::Unqualified
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  #[test]
+  fn default_qualification() {
+    assert_eq!(Qualification::default(), Qualification::Unqualified);
+  }
+}

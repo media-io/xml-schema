@@ -40,6 +40,20 @@ impl Implementation for SimpleType {
   }
 }
 
+impl SimpleType {
+  pub fn get_type_implementation(
+    &self,
+    context: &XsdContext,
+    prefix: &Option<String>,
+  ) -> TokenStream {
+    if let Some(restriction) = &self.restriction {
+      restriction.get_type_implementation(context, prefix)
+    } else {
+      panic!("No restriction for this simple type {:?}", self);
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
