@@ -103,7 +103,7 @@ impl Element {
     }
 
     let name = if self.name.to_lowercase() == "type" {
-      "Kind".to_string()
+      "kind".to_string()
     } else {
       self.name.to_snake_case()
     };
@@ -128,6 +128,12 @@ impl Element {
 
     let rust_type = if multiple {
       quote!(Vec<#rust_type>)
+    } else {
+      rust_type
+    };
+
+    let rust_type = if self.min_occurences == Some(0) {
+      quote!(Option<#rust_type>)
     } else {
       rust_type
     };

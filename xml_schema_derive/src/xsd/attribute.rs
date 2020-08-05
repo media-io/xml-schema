@@ -1,6 +1,7 @@
 use crate::xsd::{
   rust_types_mapping::RustTypesMapping, simple_type::SimpleType, Implementation, XsdContext,
 };
+use heck::SnakeCase;
 use log::debug;
 use proc_macro2::{Span, TokenStream};
 use std::io::prelude::*;
@@ -54,7 +55,8 @@ impl Implementation for Attribute {
     if self.name.is_none() {
       return quote!();
     }
-    let name = self.name.clone().unwrap();
+    let raw_name = self.name.clone().unwrap();
+    let name = raw_name.to_snake_case();
 
     let name = if name == "type" {
       "kind".to_string()
@@ -81,8 +83,15 @@ impl Implementation for Attribute {
       quote!(#rust_type)
     };
 
+    let attributes =
+      if name == raw_name {
+        quote!(attribute)
+      } else {
+        quote!(attribute, rename=#raw_name)
+      };
+
     quote!(
-      #[yaserde(attribute)]
+      #[yaserde(#attributes)]
       pub #field_name: #rust_type,
     )
   }
@@ -117,7 +126,7 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      "# [ yaserde ( attribute ) ] pub language : String ,".to_string()
+      r#"# [ yaserde ( attribute ) ] pub language : String ,"#
     );
   }
 
@@ -141,7 +150,7 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      "# [ yaserde ( attribute ) ] pub language : Option < String > ,".to_string()
+      r#"# [ yaserde ( attribute ) ] pub language : Option < String > ,"#
     );
   }
 
@@ -165,7 +174,7 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      "# [ yaserde ( attribute ) ] pub kind : Option < String > ,".to_string()
+      r#"# [ yaserde ( attribute , rename = "type" ) ] pub kind : Option < String > ,"#
     );
   }
 
@@ -189,7 +198,7 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      "# [ yaserde ( attribute ) ] pub kind : Option < MyType > ,".to_string()
+      r#"# [ yaserde ( attribute , rename = "type" ) ] pub kind : Option < MyType > ,"#
     );
   }
 

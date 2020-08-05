@@ -45,7 +45,7 @@ impl RustTypesMapping {
     match item {
       "bool" => quote!(bool),
       "boolean" => quote!(bool),
-      "positiveInteger" => quote!(u32),
+      "positiveInteger" => quote!(u64),
       "byte" => quote!(i8),
       "unsignedByte" => quote!(u8),
       "short" => quote!(i16),
@@ -115,7 +115,7 @@ mod tests {
         .unwrap();
 
     assert!(RustTypesMapping::get(&context, "xs:boolean").to_string() == "bool");
-    assert!(RustTypesMapping::get(&context, "xs:positiveInteger").to_string() == "u32");
+    assert!(RustTypesMapping::get(&context, "xs:positiveInteger").to_string() == "u64");
     assert!(RustTypesMapping::get(&context, "xs:byte").to_string() == "i8");
     assert!(RustTypesMapping::get(&context, "xs:unsignedByte").to_string() == "u8");
     assert!(RustTypesMapping::get(&context, "xs:short").to_string() == "i16");
