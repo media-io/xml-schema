@@ -54,12 +54,6 @@ impl Implementation for ComplexType {
       .map(|simple_content| simple_content.implement(namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
-    let namespace_definition = if self.name == "AssetType" {
-      quote!(#[yaserde(root= "Asset", prefix = "am", namespace="am: http://www.smpte-ra.org/schemas/429-9/2007/AM")])
-    } else {
-      namespace_definition.clone()
-    };
-
     if self.complex_content.is_some() {
       debug!("Complex Content: {:?}", self);
     }
