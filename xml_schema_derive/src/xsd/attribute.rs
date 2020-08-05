@@ -83,12 +83,11 @@ impl Implementation for Attribute {
       quote!(#rust_type)
     };
 
-    let attributes =
-      if name == raw_name {
-        quote!(attribute)
-      } else {
-        quote!(attribute, rename=#raw_name)
-      };
+    let attributes = if name == raw_name {
+      quote!(attribute)
+    } else {
+      quote!(attribute, rename=#raw_name)
+    };
 
     quote!(
       #[yaserde(#attributes)]
