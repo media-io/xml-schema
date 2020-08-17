@@ -6,8 +6,8 @@ edition = "2018"
 authors = ["Marc-Antoine Arnaud <maarnaud@media-io.com>"]
 keywords = ["XML", "Schema", "XSD"]
 license = "MIT"
-repository = "https://github.com/media-io/xml_schema_derive"
-homepage = "https://github.com/media-io/xml_schema_derive"
+repository = "https://github.com/media-io/xml-schema"
+homepage = "https://github.com/media-io/xml-schema"
 documentation = "https://docs.rs/xml_schema"
 readme = "../README.md"
 
