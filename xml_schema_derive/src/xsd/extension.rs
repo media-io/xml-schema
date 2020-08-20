@@ -51,6 +51,17 @@ impl Implementation for Extension {
   }
 }
 
+impl Extension {
+  pub fn get_field_implementation(
+    &self,
+    context: &XsdContext,
+    _prefix: &Option<String>,
+  ) -> TokenStream {
+    let rust_type = RustTypesMapping::get(context, &self.base);
+    quote!(pub content : #rust_type)
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;

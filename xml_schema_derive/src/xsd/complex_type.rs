@@ -54,9 +54,17 @@ impl Implementation for ComplexType {
       .map(|simple_content| simple_content.implement(namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
-    if self.complex_content.is_some() {
-      debug!("Complex Content: {:?}", self);
-    }
+    let complex_content = self
+      .complex_content
+      .as_ref()
+      .map(|complex_content| {
+        let complex_content_type = complex_content.get_field_implementation(context, prefix);
+        quote!(
+          #[yaserde(flatten)]
+          #complex_content_type,
+        )
+      })
+      .unwrap_or_else(TokenStream::new);
 
     let attributes: TokenStream = self
       .attributes
@@ -84,6 +92,7 @@ impl Implementation for ComplexType {
       pub struct #struct_name {
         #sequence
         #simple_content
+        #complex_content
         #attributes
       }
 
@@ -95,14 +104,22 @@ impl Implementation for ComplexType {
 impl ComplexType {
   pub fn get_field_implementation(
     &self,
-    prefix: &Option<String>,
     context: &XsdContext,
+    prefix: &Option<String>,
   ) -> TokenStream {
-    self
-      .sequence
-      .as_ref()
-      .map(|sequence| sequence.get_field_implementation(context, prefix))
-      .unwrap_or_else(TokenStream::new)
+    if self.sequence.is_some() {
+      self
+        .sequence
+        .as_ref()
+        .map(|sequence| sequence.get_field_implementation(context, prefix))
+        .unwrap_or_else(TokenStream::new)
+    } else {
+      self
+        .simple_content
+        .as_ref()
+        .map(|simple_content| simple_content.get_field_implementation(context, prefix))
+        .unwrap_or_else(TokenStream::new)
+    }
   }
 
   pub fn get_integrated_implementation(&self, parent_name: &str) -> TokenStream {
@@ -116,9 +133,5 @@ impl ComplexType {
     }
 
     quote!(String)
-    // println!("{:?}", self);
-    // panic!(
-    //   "[Complex Type] Unimplemented complex type for parent element {:?}", parent_name
-    // );
   }
 }

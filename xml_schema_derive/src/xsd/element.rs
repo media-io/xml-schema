@@ -1,6 +1,6 @@
 use crate::xsd::{
   annotation::Annotation, complex_type::ComplexType, max_occurences::MaxOccurences,
-  rust_types_mapping::RustTypesMapping, Implementation, XsdContext,
+  rust_types_mapping::RustTypesMapping, simple_type::SimpleType, Implementation, XsdContext,
 };
 use heck::{CamelCase, SnakeCase};
 use log::{debug, info};
@@ -23,7 +23,9 @@ pub struct Element {
   #[yaserde(rename = "maxOccurs", attribute)]
   pub max_occurences: Option<MaxOccurences>,
   #[yaserde(rename = "complexType")]
-  pub complex_type: Vec<ComplexType>,
+  pub complex_type: Option<ComplexType>,
+  #[yaserde(rename = "simpleType")]
+  pub simple_type: Option<SimpleType>,
   #[yaserde(rename = "annotation")]
   pub annotation: Option<Annotation>,
 }
@@ -40,7 +42,7 @@ impl Implementation for Element {
       Span::call_site(),
     );
 
-    let fields = if let Some(kind) = &self.kind {
+    let (fields, extra_structs) = if let Some(kind) = &self.kind {
       let subtype_mode = if RustTypesMapping::is_xs_string(context, kind) {
         quote!(text)
       } else {
@@ -49,16 +51,21 @@ impl Implementation for Element {
 
       let extern_type = RustTypesMapping::get(context, kind);
 
-      quote!(
-        #[yaserde(#subtype_mode)]
-        pub content: #extern_type,
+      (
+        quote!(
+          #[yaserde(#subtype_mode)]
+          pub content: #extern_type,
+        ),
+        quote!(),
       )
     } else {
-      self
+      let fields_definition = self
         .complex_type
         .iter()
-        .map(|complex_type| complex_type.get_field_implementation(prefix, context))
-        .collect()
+        .map(|complex_type| complex_type.get_field_implementation(context, prefix))
+        .collect();
+
+      (fields_definition, quote!())
     };
 
     let docs = self
@@ -74,6 +81,8 @@ impl Implementation for Element {
       pub struct #struct_name {
         #fields
       }
+
+      #extra_structs
     }
   }
 }
@@ -85,7 +94,7 @@ impl Element {
     prefix: &Option<String>,
     context: &XsdContext,
   ) -> TokenStream {
-    if self.complex_type.is_empty() {
+    if self.complex_type.is_none() {
       return quote!();
     }
 
@@ -115,8 +124,10 @@ impl Element {
     let attribute_name = Ident::new(&name, Span::call_site());
     let yaserde_rename = &self.name;
 
-    let rust_type = if let Some(complex_type) = self.complex_type.first() {
+    let rust_type = if let Some(complex_type) = &self.complex_type {
       complex_type.get_integrated_implementation(&self.name)
+    } else if let Some(simple_type) = &self.simple_type {
+      simple_type.get_type_implementation(context, &Some(self.name.to_owned()))
     } else if let Some(kind) = &self.kind {
       RustTypesMapping::get(context, kind)
     } else {
@@ -168,7 +179,8 @@ mod tests {
       refers: None,
       min_occurences: None,
       max_occurences: None,
-      complex_type: vec![],
+      complex_type: None,
+      simple_type: None,
       annotation: Some(Annotation {
         id: None,
         attributes: vec![],
@@ -199,7 +211,8 @@ mod tests {
       refers: None,
       min_occurences: None,
       max_occurences: None,
-      complex_type: vec![],
+      complex_type: None,
+      simple_type: None,
       annotation: Some(Annotation {
         id: None,
         attributes: vec![],

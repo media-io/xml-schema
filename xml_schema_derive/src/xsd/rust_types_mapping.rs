@@ -23,7 +23,7 @@ impl RustTypesMapping {
         RustTypesMapping::basic_type(*items.last().unwrap())
       }
     } else {
-      unimplemented!();
+      panic!("Unknown type {}", kind)
     }
   }
 

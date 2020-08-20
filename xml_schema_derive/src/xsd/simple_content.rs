@@ -23,3 +23,13 @@ impl Implementation for SimpleContent {
       .implement(namespace_definition, prefix, context)
   }
 }
+
+impl SimpleContent {
+  pub fn get_field_implementation(
+    &self,
+    context: &XsdContext,
+    prefix: &Option<String>,
+  ) -> TokenStream {
+    self.extension.get_field_implementation(context, prefix)
+  }
+}
