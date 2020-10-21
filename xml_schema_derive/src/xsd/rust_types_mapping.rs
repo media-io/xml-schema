@@ -54,6 +54,7 @@ impl RustTypesMapping {
       "unsignedInt" => quote!(u32),
       "long" => quote!(i64),
       "unsignedLong" | "nonNegativeInteger" => quote!(u64),
+      "float" => quote!(f32),
       "double" => quote!(f64),
       "decimal" => quote!(String), // TODO replace with f64
       "string" => quote!(String),
@@ -126,6 +127,7 @@ mod tests {
     assert!(RustTypesMapping::get(&context, "xs:long").to_string() == "i64");
     assert!(RustTypesMapping::get(&context, "xs:unsignedLong").to_string() == "u64");
     assert!(RustTypesMapping::get(&context, "xs:nonNegativeInteger").to_string() == "u64");
+    assert!(RustTypesMapping::get(&context, "xs:float").to_string() == "f32");
     assert!(RustTypesMapping::get(&context, "xs:double").to_string() == "f64");
     assert!(RustTypesMapping::get(&context, "xs:decimal").to_string() == "String");
     assert!(RustTypesMapping::get(&context, "xs:string").to_string() == "String");
