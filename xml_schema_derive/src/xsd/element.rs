@@ -54,7 +54,7 @@ impl Implementation for Element {
       (
         quote!(
           #[yaserde(#subtype_mode)]
-          pub content: #extern_type,
+          pub content: types::#extern_type,
         ),
         quote!(),
       )
