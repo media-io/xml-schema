@@ -24,7 +24,7 @@ impl Implementation for List {
     quote!(
       #[derive(Clone, Debug, Default, PartialEq)]
       pub struct #struct_name {
-        items: Vec<#list_type>
+        pub items: Vec<#list_type>
       }
 
       impl YaDeserialize for #struct_name {

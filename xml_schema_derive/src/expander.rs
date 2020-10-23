@@ -9,7 +9,12 @@ pub fn expand_derive(ast: &syn::DeriveInput) -> Result<TokenStream, String> {
 
   info!("{:?}", attributes);
 
-  let xsd = Xsd::new_from_file(&attributes.source, &attributes.module_namespace_mappings)?;
+  let xsd = Xsd::new_from_file(
+    ast.ident.to_string(),
+    ast.vis.clone(),
+    &attributes.source,
+    &attributes.module_namespace_mappings,
+  )?;
   let generated = xsd.implement(&attributes.target_prefix);
 
   if let Some(store_generated_code) = &attributes.store_generated_code {

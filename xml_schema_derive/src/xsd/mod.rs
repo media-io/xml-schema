@@ -18,10 +18,12 @@ mod simple_type;
 mod union;
 mod xsd_context;
 
+use heck::SnakeCase;
 use log::info;
 use proc_macro2::{Ident, TokenStream};
 use std::collections::BTreeMap;
 use std::fs;
+use syn::Visibility;
 use xsd_context::XsdContext;
 use yaserde::de::from_str;
 
@@ -48,12 +50,16 @@ trait Implementation {
 
 #[derive(Clone, Debug)]
 pub struct Xsd {
+  name: String,
+  vis: Visibility,
   context: XsdContext,
   schema: schema::Schema,
 }
 
 impl Xsd {
   pub fn new(
+    name: String,
+    vis: Visibility,
     content: &str,
     module_namespace_mappings: &BTreeMap<String, String>,
   ) -> Result<Self, String> {
@@ -61,10 +67,17 @@ impl Xsd {
     let context = context.with_module_namespace_mappings(module_namespace_mappings);
     let schema: schema::Schema = from_str(content)?;
 
-    Ok(Xsd { context, schema })
+    Ok(Xsd {
+      name,
+      vis,
+      context,
+      schema,
+    })
   }
 
   pub fn new_from_file(
+    name: String,
+    vis: Visibility,
     source: &str,
     module_namespace_mappings: &BTreeMap<String, String>,
   ) -> Result<Self, String> {
@@ -88,12 +101,23 @@ impl Xsd {
       content
     };
 
-    Xsd::new(&content, module_namespace_mappings)
+    Xsd::new(name, vis, &content, module_namespace_mappings)
   }
 
   pub fn implement(&self, target_prefix: &Option<String>) -> TokenStream {
-    self
+    let schema = self
       .schema
-      .implement(&TokenStream::new(), target_prefix, &self.context)
+      .implement(&TokenStream::new(), target_prefix, &self.context);
+
+    let mod_name = format_ident!("{}", self.name.to_snake_case());
+    let vis = &self.vis;
+
+    quote! {
+        mod #mod_name {
+            #schema
+        }
+
+        #vis use #mod_name::*;
+    }
   }
 }

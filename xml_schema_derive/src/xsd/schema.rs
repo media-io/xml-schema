@@ -65,8 +65,21 @@ impl Implementation for Schema {
       .collect();
 
     quote!(
-      #simple_types
-      #complex_types
+      pub mod types {
+          use yaserde::{YaDeserialize, YaSerialize};
+          use yaserde_derive::{YaDeserialize, YaSerialize};
+          use std::io::{Read, Write};
+          use xml::reader::{EventReader, XmlEvent};
+
+          #simple_types
+          #complex_types
+      }
+
+      use yaserde::{YaDeserialize, YaSerialize};
+      use yaserde_derive::{YaDeserialize, YaSerialize};
+      use std::io::{Read, Write};
+      use xml::reader::{EventReader, XmlEvent};
+
       #elements
     )
   }
