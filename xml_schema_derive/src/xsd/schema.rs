@@ -143,7 +143,7 @@ mod tests {
 
     assert_eq!(
       implementation,
-      r#"# [ yaserde ( prefix = "prefix" , namespace = "prefix: http://example.com" ) ]"#
+      r#"# [yaserde (prefix = "prefix" , namespace = "prefix: http://example.com")]"#
     );
   }
 }

@@ -125,7 +125,7 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      r#"# [ yaserde ( attribute ) ] pub language : String ,"#
+      r#"# [yaserde (attribute)] pub language : String ,"#
     );
   }
 
@@ -149,7 +149,7 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      r#"# [ yaserde ( attribute ) ] pub language : Option < String > ,"#
+      r#"# [yaserde (attribute)] pub language : Option < String > ,"#
     );
   }
 
@@ -173,7 +173,7 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      r#"# [ yaserde ( attribute , rename = "type" ) ] pub kind : Option < String > ,"#
+      r#"# [yaserde (attribute , rename = "type")] pub kind : Option < String > ,"#
     );
   }
 
@@ -197,7 +197,7 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      r#"# [ yaserde ( attribute , rename = "type" ) ] pub kind : Option < MyType > ,"#
+      r#"# [yaserde (attribute , rename = "type")] pub kind : Option < MyType > ,"#
     );
   }
 

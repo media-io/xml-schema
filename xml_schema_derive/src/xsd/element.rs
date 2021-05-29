@@ -167,9 +167,9 @@ mod tests {
   use super::*;
 
   static DERIVES: &str =
-    "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] ";
+    "# [derive (Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize)] ";
 
-  static DOCS: &str = r#"# [ doc = "Loudness measured in Decibels" ] "#;
+  static DOCS: &str = r#"# [doc = "Loudness measured in Decibels"] "#;
 
   #[test]
   fn extern_type() {
@@ -197,7 +197,7 @@ mod tests {
     assert_eq!(
       ts.to_string(),
       format!(
-        "{}{}pub struct Volume {{ # [ yaserde ( flatten ) ] pub content : VolumeType , }}",
+        "{}{}pub struct Volume {{ # [yaserde (flatten)] pub content : VolumeType , }}",
         DOCS, DERIVES
       )
     );
@@ -229,7 +229,7 @@ mod tests {
     assert_eq!(
       ts.to_string(),
       format!(
-        "{}{}pub struct Volume {{ # [ yaserde ( text ) ] pub content : String , }}",
+        "{}{}pub struct Volume {{ # [yaserde (text)] pub content : String , }}",
         DOCS, DERIVES
       )
     );
