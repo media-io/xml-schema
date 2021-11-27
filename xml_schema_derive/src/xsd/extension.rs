@@ -64,6 +64,7 @@ impl Extension {
 
 #[cfg(test)]
 mod tests {
+  use std::str::FromStr;
   use super::*;
 
   #[test]
@@ -81,7 +82,7 @@ mod tests {
     let ts = st
       .implement(&TokenStream::new(), &None, &context)
       .to_string();
-    assert!(ts == "# [ yaserde ( text ) ] pub content : String ,");
+    assert_eq!(ts, TokenStream::from_str("# [ yaserde ( text ) ] pub content : String ,").unwrap().to_string());
   }
 
   #[test]
@@ -116,6 +117,6 @@ mod tests {
     let ts = st
       .implement(&TokenStream::new(), &None, &context)
       .to_string();
-    assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] pub attribute_1 : String , # [ yaserde ( attribute ) ] pub attribute_2 : Option < bool > ,");
+    assert_eq!(ts, TokenStream::from_str("# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] pub attribute_1 : String , # [ yaserde ( attribute ) ] pub attribute_2 : Option < bool > ,").unwrap().to_string());
   }
 }

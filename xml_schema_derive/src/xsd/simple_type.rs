@@ -56,6 +56,7 @@ impl SimpleType {
 
 #[cfg(test)]
 mod tests {
+  use std::str::FromStr;
   use super::*;
 
   static DERIVES: &str =
@@ -77,10 +78,10 @@ mod tests {
     let ts = st.implement(&quote!(), &None, &context).to_string();
 
     assert_eq!(
-      format!(
+      TokenStream::from_str(format!(
         "{}pub struct Test {{ # [ yaserde ( text ) ] pub content : std :: string :: String , }}",
         DERIVES
-      ),
+      ).as_str()).unwrap().to_string(),
       ts
     );
   }

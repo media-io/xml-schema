@@ -164,6 +164,7 @@ impl Element {
 
 #[cfg(test)]
 mod tests {
+  use std::str::FromStr;
   use super::*;
 
   static DERIVES: &str =
@@ -196,10 +197,10 @@ mod tests {
 
     assert_eq!(
       ts.to_string(),
-      format!(
+      TokenStream::from_str(format!(
         "{}{}pub struct Volume {{ # [ yaserde ( flatten ) ] pub content : VolumeType , }}",
         DOCS, DERIVES
-      )
+      ).as_str()).unwrap().to_string()
     );
   }
 
@@ -228,10 +229,10 @@ mod tests {
 
     assert_eq!(
       ts.to_string(),
-      format!(
+      TokenStream::from_str(format!(
         "{}{}pub struct Volume {{ # [ yaserde ( text ) ] pub content : String , }}",
         DOCS, DERIVES
-      )
+      ).as_str()).unwrap().to_string()
     );
   }
 }
