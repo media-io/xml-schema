@@ -64,8 +64,8 @@ impl Extension {
 
 #[cfg(test)]
 mod tests {
-  use std::str::FromStr;
   use super::*;
+  use std::str::FromStr;
 
   #[test]
   fn extension() {
@@ -82,7 +82,12 @@ mod tests {
     let ts = st
       .implement(&TokenStream::new(), &None, &context)
       .to_string();
-    assert_eq!(ts, TokenStream::from_str("# [ yaserde ( text ) ] pub content : String ,").unwrap().to_string());
+    assert_eq!(
+      ts,
+      TokenStream::from_str("# [ yaserde ( text ) ] pub content : String ,")
+        .unwrap()
+        .to_string()
+    );
   }
 
   #[test]

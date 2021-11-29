@@ -98,8 +98,8 @@ impl Implementation for Attribute {
 
 #[cfg(test)]
 mod tests {
-  use std::str::FromStr;
   use super::*;
+  use std::str::FromStr;
 
   #[test]
   fn default_required() {
@@ -126,7 +126,9 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      TokenStream::from_str(r#"# [ yaserde ( attribute ) ] pub language : String ,"#).unwrap().to_string()
+      TokenStream::from_str(r#"# [ yaserde ( attribute ) ] pub language : String ,"#)
+        .unwrap()
+        .to_string()
     );
   }
 
@@ -150,7 +152,9 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      TokenStream::from_str(r#"# [ yaserde ( attribute ) ] pub language : Option < String > ,"#).unwrap().to_string()
+      TokenStream::from_str(r#"# [ yaserde ( attribute ) ] pub language : Option < String > ,"#)
+        .unwrap()
+        .to_string()
     );
   }
 
@@ -174,7 +178,11 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      TokenStream::from_str(r#"# [ yaserde ( attribute , rename = "type" ) ] pub kind : Option < String > ,"#).unwrap().to_string()
+      TokenStream::from_str(
+        r#"# [ yaserde ( attribute , rename = "type" ) ] pub kind : Option < String > ,"#
+      )
+      .unwrap()
+      .to_string()
     );
   }
 
@@ -198,7 +206,11 @@ mod tests {
     );
     assert_eq!(
       implementation,
-      TokenStream::from_str(r#"# [ yaserde ( attribute , rename = "type" ) ] pub kind : Option < MyType > ,"#).unwrap().to_string()
+      TokenStream::from_str(
+        r#"# [ yaserde ( attribute , rename = "type" ) ] pub kind : Option < MyType > ,"#
+      )
+      .unwrap()
+      .to_string()
     );
   }
 

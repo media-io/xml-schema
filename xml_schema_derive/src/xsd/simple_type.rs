@@ -56,8 +56,8 @@ impl SimpleType {
 
 #[cfg(test)]
 mod tests {
-  use std::str::FromStr;
   use super::*;
+  use std::str::FromStr;
 
   static DERIVES: &str =
     "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] ";
@@ -78,10 +78,15 @@ mod tests {
     let ts = st.implement(&quote!(), &None, &context).to_string();
 
     assert_eq!(
-      TokenStream::from_str(format!(
-        "{}pub struct Test {{ # [ yaserde ( text ) ] pub content : std :: string :: String , }}",
-        DERIVES
-      ).as_str()).unwrap().to_string(),
+      TokenStream::from_str(
+        format!(
+          "{}pub struct Test {{ # [ yaserde ( text ) ] pub content : std :: string :: String , }}",
+          DERIVES
+        )
+        .as_str()
+      )
+      .unwrap()
+      .to_string(),
       ts
     );
   }

@@ -71,9 +71,9 @@ impl Implementation for List {
 
 #[cfg(test)]
 mod tests {
-  use std::str::FromStr;
   use super::*;
   use proc_macro2::Span;
+  use std::str::FromStr;
   use syn::Ident;
 
   #[test]

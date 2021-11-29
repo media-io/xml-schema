@@ -93,8 +93,8 @@ fn generate_namespace_definition(
 
 #[cfg(test)]
 mod tests {
-  use std::str::FromStr;
   use super::*;
+  use std::str::FromStr;
 
   #[test]
   fn default_schema_implementation() {
@@ -144,7 +144,11 @@ mod tests {
 
     assert_eq!(
       implementation,
-      TokenStream::from_str(r#"# [ yaserde ( prefix = "prefix" , namespace = "prefix: http://example.com" ) ]"#).unwrap().to_string()
+      TokenStream::from_str(
+        r#"# [ yaserde ( prefix = "prefix" , namespace = "prefix: http://example.com" ) ]"#
+      )
+      .unwrap()
+      .to_string()
     );
   }
 }
