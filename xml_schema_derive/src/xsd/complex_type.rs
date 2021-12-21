@@ -17,6 +17,7 @@ pub struct ComplexType {
   pub name: String,
   #[yaserde(rename = "attribute")]
   pub attributes: Vec<Attribute>,
+  #[yaserde(rename = "sequence")]
   pub sequence: Option<Sequence>,
   #[yaserde(rename = "simpleContent")]
   pub simple_content: Option<SimpleContent>,

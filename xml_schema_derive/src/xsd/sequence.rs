@@ -1,4 +1,4 @@
-use crate::xsd::{element::Element, Implementation, XsdContext};
+use crate::xsd::{choice::Choice, element::Element, Implementation, XsdContext};
 use log::info;
 use proc_macro2::TokenStream;
 
@@ -7,6 +7,8 @@ use proc_macro2::TokenStream;
 pub struct Sequence {
   #[yaserde(rename = "element")]
   pub elements: Vec<Element>,
+  #[yaserde(rename = "choice")]
+  pub choices: Vec<Choice>,
 }
 
 impl Implementation for Sequence {
@@ -17,11 +19,22 @@ impl Implementation for Sequence {
     context: &XsdContext,
   ) -> TokenStream {
     info!("Generate elements");
-    self
+    let elements: TokenStream = self
       .elements
       .iter()
       .map(|element| element.get_field_implementation(context, prefix, false, false))
-      .collect()
+      .collect();
+
+    let choices: TokenStream = self
+      .choices
+      .iter()
+      .map(|choice| choice.get_field_implementation(context, prefix))
+      .collect();
+
+    quote!(
+      #elements
+      #choices
+    )
   }
 }
 
@@ -45,10 +58,21 @@ impl Sequence {
     context: &XsdContext,
     prefix: &Option<String>,
   ) -> TokenStream {
-    self
+    let elements: TokenStream = self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix, true, false))
-      .collect()
+      .map(|element| element.get_field_implementation(context, prefix, false, false))
+      .collect();
+
+    let choices: TokenStream = self
+      .choices
+      .iter()
+      .map(|choice| choice.get_field_implementation(context, prefix))
+      .collect();
+
+    quote!(
+      #elements
+      #choices
+    )
   }
 }

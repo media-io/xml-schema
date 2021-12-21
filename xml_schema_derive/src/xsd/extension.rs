@@ -19,6 +19,8 @@ pub struct Extension {
   pub sequences: Vec<Sequence>,
   #[yaserde(rename = "group")]
   pub group: Option<Group>,
+  #[yaserde(rename = "choice")]
+  pub choices: Vec<Choice>,
 }
 
 impl Implementation for Extension {
