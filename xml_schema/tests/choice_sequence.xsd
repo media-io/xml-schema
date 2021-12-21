@@ -1,0 +1,28 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:complexType name="Firstname">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="scope" type="xs:anyURI" use="optional" default="http://example.com#elements"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="Lastname">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="scope" type="xs:anyURI" use="optional" default="http://example.com#elements"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+
+    <xs:complexType name="Parent">
+        <xs:sequence>
+            <xs:element name="Name" type="xsd:string" minOccurs="1"/>
+            <xs:choice>
+                <xs:element name="XFirstname" type="Firstname"/>
+                <xs:element name="XLastname" type="Lastname"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

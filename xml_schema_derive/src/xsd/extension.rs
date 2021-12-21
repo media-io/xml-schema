@@ -20,6 +20,8 @@ pub struct Extension {
   pub attributes: Vec<Attribute>,
   #[yaserde(rename = "sequence")]
   pub sequences: Vec<Sequence>,
+  #[yaserde(rename = "choice")]
+  pub choices: Vec<Choice>,
 }
 
 impl Implementation for Extension {
