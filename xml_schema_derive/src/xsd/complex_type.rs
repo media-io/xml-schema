@@ -1,5 +1,5 @@
 use crate::xsd::{
-  annotation::Annotation, attribute::Attribute, complex_content::ComplexContent,
+  annotation::Annotation, attribute::Attribute, choice::Choice, complex_content::ComplexContent,
   sequence::Sequence, simple_content::SimpleContent, Implementation, XsdContext,
 };
 use heck::CamelCase;
@@ -27,6 +27,8 @@ pub struct ComplexType {
   pub complex_content: Option<ComplexContent>,
   #[yaserde(rename = "annotation")]
   pub annotation: Option<Annotation>,
+  #[yaserde(rename = "choice")]
+  pub choice: Option<Choice>,
 }
 
 impl Implementation for ComplexType {
@@ -84,6 +86,18 @@ impl Implementation for ComplexType {
       .map(|annotation| annotation.implement(&namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
+    let choice = self
+      .choice
+      .as_ref()
+      .map(|choice| choice.implement(&namespace_definition, prefix, context))
+      .unwrap_or_else(TokenStream::new);
+
+    let choice_field = self
+      .choice
+      .as_ref()
+      .map(|choice| choice.get_field_implementation(context, prefix))
+      .unwrap_or_else(TokenStream::new);
+
     quote! {
       #docs
 
@@ -93,10 +107,13 @@ impl Implementation for ComplexType {
         #sequence
         #simple_content
         #complex_content
+        #choice_field
         #attributes
       }
 
       #sub_types_implementation
+
+      #choice
     }
   }
 }

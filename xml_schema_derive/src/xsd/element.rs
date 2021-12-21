@@ -106,6 +106,7 @@ impl Element {
     context: &XsdContext,
     prefix: &Option<String>,
     multiple: bool,
+    optional: bool,
   ) -> TokenStream {
     if self.name == "" {
       return quote!();
@@ -143,7 +144,7 @@ impl Element {
       rust_type
     };
 
-    let rust_type = if self.min_occurences == Some(0) {
+    let rust_type = if optional || self.min_occurences == Some(0) {
       quote!(Option<#rust_type>)
     } else {
       rust_type

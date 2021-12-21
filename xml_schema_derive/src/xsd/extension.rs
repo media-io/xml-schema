@@ -1,6 +1,6 @@
 use crate::xsd::{
-  attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence, Implementation,
-  XsdContext,
+  attribute::Attribute, choice::Choice, rust_types_mapping::RustTypesMapping, sequence::Sequence,
+  Implementation, XsdContext,
 };
 use log::debug;
 use proc_macro2::TokenStream;
