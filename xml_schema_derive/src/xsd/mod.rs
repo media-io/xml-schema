@@ -1,6 +1,7 @@
 mod annotation;
 mod attribute;
 mod attribute_group;
+mod choice;
 mod complex_content;
 mod complex_type;
 mod element;

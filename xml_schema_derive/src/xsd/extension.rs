@@ -1,5 +1,5 @@
 use crate::xsd::{
-  attribute::Attribute, group::Group, rust_types_mapping::RustTypesMapping, sequence::Sequence,
+  attribute::Attribute, choice::Choice, group::Group, rust_types_mapping::RustTypesMapping, sequence::Sequence,
   Implementation, XsdContext,
 };
 use proc_macro2::TokenStream;
