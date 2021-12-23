@@ -1,0 +1,10 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="person">
+        <xs:complexType name="parents">
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="firstname" type="xs:string"/>
+                <xs:element name="lastname" type="xs:string"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -73,10 +73,19 @@ impl Choice {
     prefix: &Option<String>,
   ) -> TokenStream {
     info!("Generate choice elements");
+
+    let multiple = matches!(self.min_occurences, Some(min_occurences) if min_occurences > 1)
+      || matches!(self.max_occurences, Some(MaxOccurences::Unbounded))
+      || matches!(self.max_occurences, Some(MaxOccurences::Number{value}) if value > 1);
+
+    // Element fields are by default declared as Option type due to the nature of the choice element.
+    // Since a vector can also be empty, use Vec<_>, rather than Option<Vec<_>>.
+    let optional = !multiple;
+
     self
       .element
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix, false, true))
+      .map(|element| element.get_field_implementation(context, prefix, multiple, optional))
       .collect()
   }
 }
