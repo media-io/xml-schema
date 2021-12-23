@@ -93,6 +93,7 @@ mod tests {
       attributes: vec![],
       sequences: vec![],
       group: None,
+      choices: vec![],
     };
 
     let context =
@@ -136,6 +137,7 @@ mod tests {
       ],
       sequences: vec![],
       group: None,
+      choices: vec![],
     };
 
     let context =

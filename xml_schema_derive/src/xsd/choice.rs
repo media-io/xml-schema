@@ -53,6 +53,20 @@ impl Implementation for Choice {
 }
 
 impl Choice {
+  pub fn get_sub_types_implementation(
+    &self,
+    context: &XsdContext,
+    namespace_definition: &TokenStream,
+    prefix: &Option<String>,
+  ) -> TokenStream {
+    info!("Generate choice sub types implementation");
+    self
+      .element
+      .iter()
+      .map(|element| element.get_subtypes_implementation(namespace_definition, prefix, context))
+      .collect()
+  }
+
   pub fn get_field_implementation(
     &self,
     context: &XsdContext,

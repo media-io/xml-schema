@@ -16,19 +16,19 @@ fn choice() {
 
   let xml_1 = r#"
   <?xml version="1.0" encoding="UTF-8"?>
-  <Parent>
-    <XFirstname>John</XFirstname>
-  </Parent>
+  <person>
+    <firstname>John</firstname>
+  </person>
   "#;
 
-  let sample_1: Parent = from_str(xml_1).unwrap();
+  let sample_1: Person = from_str(xml_1).unwrap();
 
-  let model = Parent {
-    x_firstname: Some(Firstname {
+  let model = Person {
+    firstname: Some(Firstname {
       content: "John".to_string(),
       scope: None,
     }),
-    x_lastname: None,
+    lastname: None,
   };
 
   assert_eq!(sample_1, model);
@@ -36,7 +36,7 @@ fn choice() {
   let data = to_string(&model).unwrap();
   assert_eq!(
     data,
-    r#"<?xml version="1.0" encoding="utf-8"?><Parent><XFirstname>John</XFirstname></Parent>"#
+    r#"<?xml version="1.0" encoding="utf-8"?><Person><firstname>John</firstname></Person>"#
   );
 }
 
@@ -70,6 +70,6 @@ fn choice_sequence() {
   let data = to_string(&model).unwrap();
   assert_eq!(
     data,
-    r#"<?xml version="1.0" encoding="utf-8"?><person><name>Doe</name><firstname>John</firstname></person>"#
+    r#"<?xml version="1.0" encoding="utf-8"?><Person><name>Doe</name><firstname>John</firstname></Person>"#
   );
 }

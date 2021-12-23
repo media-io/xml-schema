@@ -1,5 +1,5 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:complexType name="Firstname">
+    <xs:complexType name="firstname">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="scope" type="xs:anyURI" use="optional" default="http://example.com#elements"/>
@@ -7,7 +7,7 @@
         </xs:simpleContent>
     </xs:complexType>
 
-    <xs:complexType name="Lastname">
+    <xs:complexType name="lastname">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="scope" type="xs:anyURI" use="optional" default="http://example.com#elements"/>
@@ -16,10 +16,10 @@
     </xs:complexType>
 
 
-    <xs:complexType name="Parent">
-        <xs:choice maxOccurs="unbounded" minOccurs="0">
-            <xs:element name="XFirstname" type="Firstname"/>
-            <xs:element name="XLastname" type="Lastname"/>
+    <xs:complexType name="person">
+        <xs:choice minOccurs="0">
+            <xs:element name="firstname" type="firstname"/>
+            <xs:element name="lastname" type="lastname"/>
         </xs:choice>
     </xs:complexType>
 </xs:schema>
