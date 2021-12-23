@@ -74,6 +74,7 @@ mod tests {
       base: "xs:string".to_string(),
       attributes: vec![],
       sequences: vec![],
+      choices: vec![],
     };
 
     let context =
@@ -109,6 +110,7 @@ mod tests {
         },
       ],
       sequences: vec![],
+      choices: vec![],
     };
 
     let context =

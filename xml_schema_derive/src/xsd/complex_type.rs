@@ -75,7 +75,7 @@ impl Implementation for ComplexType {
       .map(|attribute| attribute.implement(&namespace_definition, prefix, context))
       .collect();
 
-    let sub_types_implementation = self
+    let sequence_sub_types = self
       .sequence
       .as_ref()
       .map(|sequence| sequence.get_sub_types_implementation(context, &namespace_definition, prefix))
@@ -87,10 +87,10 @@ impl Implementation for ComplexType {
       .map(|annotation| annotation.implement(&namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
-    let choice = self
+    let choice_sub_types = self
       .choice
       .as_ref()
-      .map(|choice| choice.implement(&namespace_definition, prefix, context))
+      .map(|choice| choice.get_sub_types_implementation(context, &namespace_definition, prefix))
       .unwrap_or_else(TokenStream::new);
 
     let choice_field = self
@@ -112,9 +112,8 @@ impl Implementation for ComplexType {
         #attributes
       }
 
-      #sub_types_implementation
-
-      #choice
+      #sequence_sub_types
+      #choice_sub_types
     }
   }
 }
