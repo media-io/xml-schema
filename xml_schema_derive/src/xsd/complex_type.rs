@@ -127,12 +127,20 @@ impl ComplexType {
         .as_ref()
         .map(|sequence| sequence.get_field_implementation(context, prefix))
         .unwrap_or_default()
-    } else {
+    } else if self.simple_content.is_some() {
       self
         .simple_content
         .as_ref()
         .map(|simple_content| simple_content.get_field_implementation(context, prefix))
         .unwrap_or_default()
+    } else if self.choice.is_some() {
+      self
+        .choice
+        .as_ref()
+        .map(|choice| choice.get_field_implementation(context, prefix))
+        .unwrap_or_else(TokenStream::new)
+    } else {
+      TokenStream::new()
     }
   }
 

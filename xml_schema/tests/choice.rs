@@ -73,3 +73,32 @@ fn choice_sequence() {
     r#"<?xml version="1.0" encoding="utf-8"?><Person><name>Doe</name><firstname>John</firstname></Person>"#
   );
 }
+
+#[test]
+fn choice_multiple() {
+  #[derive(Debug, XmlSchema)]
+  #[xml_schema(source = "xml_schema/tests/choice_multiple.xsd")]
+  struct ChoiceTypeSchema;
+
+  let xml_1 = r#"
+  <?xml version="1.0" encoding="UTF-8"?>
+  <person>
+    <firstname>John</firstname>
+  </person>
+  "#;
+
+  let sample_1: Person = from_str(xml_1).unwrap();
+
+  let model = Person {
+    firstnames: vec!["John".to_string()],
+    lastnames: vec![],
+  };
+
+  assert_eq!(sample_1, model);
+
+  let data = to_string(&model).unwrap();
+  assert_eq!(
+    data,
+    r#"<?xml version="1.0" encoding="utf-8"?><Person><firstname>John</firstname></Person>"#
+  );
+}
