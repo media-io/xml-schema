@@ -126,7 +126,7 @@ impl ComplexType {
     }
 
     if self.sequence.is_some() {
-      let list_wrapper = Ident::new(parent_name, Span::call_site());
+      let list_wrapper = format_ident!("r#{}", parent_name);
       return quote!(#list_wrapper);
     }
 

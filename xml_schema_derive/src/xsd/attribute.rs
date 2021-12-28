@@ -2,8 +2,7 @@ use crate::xsd::{
   rust_types_mapping::RustTypesMapping, simple_type::SimpleType, Implementation, XsdContext,
 };
 use heck::SnakeCase;
-use proc_macro2::{Span, TokenStream};
-use syn::Ident;
+use proc_macro2::TokenStream;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
@@ -55,13 +54,7 @@ impl Implementation for Attribute {
     let raw_name = self.name.clone().unwrap();
     let name = raw_name.to_snake_case();
 
-    let name = if name == "type" {
-      "kind".to_string()
-    } else {
-      name
-    };
-
-    let field_name = Ident::new(&name, Span::call_site());
+    let field_name = format_ident!("r#{}", name);
 
     let rust_type = match (
       self.reference.as_ref(),
@@ -80,11 +73,7 @@ impl Implementation for Attribute {
       quote!(#rust_type)
     };
 
-    let attributes = if name == raw_name {
-      quote!(attribute)
-    } else {
-      quote!(attribute, rename=#raw_name)
-    };
+    let attributes = quote!(attribute, rename=#raw_name);
 
     quote!(
       #[yaserde(#attributes)]

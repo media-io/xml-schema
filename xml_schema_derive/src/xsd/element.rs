@@ -109,17 +109,13 @@ impl Element {
       return quote!();
     }
 
-    let name = if self.name.to_lowercase() == "type" {
-      "kind".to_string()
-    } else {
-      self.name.to_snake_case()
-    };
+    let name = self.name.to_snake_case();
 
     info!("Generate element {:?}", name);
 
     let name = if multiple { format!("{}s", name) } else { name };
 
-    let attribute_name = Ident::new(&name, Span::call_site());
+    let attribute_name = format_ident!("r#{}", name);
     let yaserde_rename = &self.name;
 
     let rust_type = if let Some(complex_type) = &self.complex_type {
