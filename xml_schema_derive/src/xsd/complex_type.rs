@@ -3,11 +3,9 @@ use crate::xsd::{
   sequence::Sequence, simple_content::SimpleContent, Implementation, XsdContext,
 };
 use heck::CamelCase;
-use log::{debug, info};
+use log::info;
 use proc_macro2::{Span, TokenStream};
-use std::io::prelude::*;
 use syn::Ident;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(

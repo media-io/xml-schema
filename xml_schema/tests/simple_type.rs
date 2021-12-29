@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate yaserde_derive;
 
-use log::debug;
 use std::io::prelude::*;
 use xml_schema_derive::XmlSchema;
 use yaserde::de::from_str;

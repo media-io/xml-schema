@@ -2,10 +2,8 @@ use crate::xsd::{
   attribute, attribute_group, complex_type, element, import, qualification, simple_type,
   Implementation, XsdContext,
 };
-use log::{debug, info};
+use log::info;
 use proc_macro2::TokenStream;
-use std::io::prelude::*;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(

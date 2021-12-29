@@ -2,10 +2,7 @@ use crate::xsd::{
   attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence, Implementation,
   XsdContext,
 };
-use log::debug;
 use proc_macro2::TokenStream;
-use std::io::prelude::*;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(

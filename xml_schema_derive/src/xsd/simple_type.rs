@@ -1,10 +1,7 @@
 use crate::xsd::{list::List, restriction::Restriction, union::Union, Implementation, XsdContext};
 use heck::CamelCase;
-use log::debug;
 use proc_macro2::{Span, TokenStream};
-use std::io::prelude::*;
 use syn::Ident;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
