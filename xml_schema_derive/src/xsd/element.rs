@@ -105,11 +105,13 @@ impl Element {
     &self,
     context: &XsdContext,
     prefix: &Option<String>,
-    multiple: bool,
   ) -> TokenStream {
     if self.name == "" {
       return quote!();
     }
+
+    let multiple = self.max_occurences.is_some()
+      && self.max_occurences != Some(MaxOccurences::Number { value: 1 });
 
     let name = if self.name.to_lowercase() == "type" {
       "kind".to_string()
@@ -143,7 +145,7 @@ impl Element {
       rust_type
     };
 
-    let rust_type = if self.min_occurences == Some(0) {
+    let rust_type = if !multiple && self.min_occurences == Some(0) {
       quote!(Option<#rust_type>)
     } else {
       rust_type
