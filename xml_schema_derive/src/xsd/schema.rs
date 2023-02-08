@@ -117,7 +117,7 @@ mod tests {
         .unwrap();
 
     let implementation = format!("{}", schema.implement(&TokenStream::new(), &None, &context));
-    assert_eq!(implementation, "");
+    assert_eq!(implementation, "pub mod types { use yaserde :: { YaDeserialize , YaSerialize } ; use yaserde_derive :: { YaDeserialize , YaSerialize } ; use std :: io :: { Read , Write } ; use xml :: reader :: { EventReader , XmlEvent } ; } use yaserde :: { YaDeserialize , YaSerialize } ; use yaserde_derive :: { YaDeserialize , YaSerialize } ; use std :: io :: { Read , Write } ; use xml :: reader :: { EventReader , XmlEvent } ;");
   }
 
   #[test]
