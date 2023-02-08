@@ -197,7 +197,7 @@ mod tests {
     assert_eq!(
       ts.to_string(),
       format!(
-        "{}{}pub struct Volume {{ # [yaserde (flatten)] pub content : VolumeType , }}",
+        "{}{}pub struct Volume {{ # [yaserde (flatten)] pub content : types :: VolumeType , }}",
         DOCS, DERIVES
       )
     );
@@ -229,7 +229,7 @@ mod tests {
     assert_eq!(
       ts.to_string(),
       format!(
-        "{}{}pub struct Volume {{ # [yaserde (text)] pub content : String , }}",
+        "{}{}pub struct Volume {{ # [yaserde (text)] pub content : types :: String , }}",
         DOCS, DERIVES
       )
     );
