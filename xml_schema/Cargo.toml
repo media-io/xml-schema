@@ -19,5 +19,5 @@ xml-schema-derive = { version = "0.0.7", path = "../xml_schema_derive", optional
 log = "0.4"
 xml-rs = "0.8"
 xml-schema-derive = { version = "0.0.7", path = "../xml_schema_derive" }
-yaserde_derive = { version = "0.4" }
-yaserde = { version = "0.4" }
+yaserde_derive = { version = "0.8" }
+yaserde = { version = "0.8" }

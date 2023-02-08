@@ -3,11 +3,8 @@ use crate::xsd::{
   sequence::Sequence, simple_content::SimpleContent, Implementation, XsdContext,
 };
 use heck::CamelCase;
-use log::{debug, info};
 use proc_macro2::{Span, TokenStream};
-use std::io::prelude::*;
 use syn::Ident;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
@@ -40,14 +37,14 @@ impl Implementation for ComplexType {
       &self.name.replace('.', "_").to_camel_case(),
       Span::call_site(),
     );
-    info!("Generate sequence");
+    log::info!("Generate sequence");
     let sequence = self
       .sequence
       .as_ref()
       .map(|sequence| sequence.implement(namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
-    info!("Generate simple content");
+    log::info!("Generate simple content");
     let simple_content = self
       .simple_content
       .as_ref()

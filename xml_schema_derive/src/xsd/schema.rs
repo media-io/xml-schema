@@ -2,10 +2,7 @@ use crate::xsd::{
   attribute, attribute_group, complex_type, element, import, qualification, simple_type,
   Implementation, XsdContext,
 };
-use log::{debug, info};
 use proc_macro2::TokenStream;
-use std::io::prelude::*;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
@@ -43,21 +40,21 @@ impl Implementation for Schema {
   ) -> TokenStream {
     let namespace_definition = generate_namespace_definition(target_prefix, &self.target_namespace);
 
-    info!("Generate elements");
+    log::info!("Generate elements");
     let elements: TokenStream = self
       .elements
       .iter()
       .map(|element| element.implement(&namespace_definition, target_prefix, context))
       .collect();
 
-    info!("Generate simple types");
+    log::info!("Generate simple types");
     let simple_types: TokenStream = self
       .simple_type
       .iter()
       .map(|simple_type| simple_type.implement(&namespace_definition, target_prefix, context))
       .collect();
 
-    info!("Generate complex types");
+    log::info!("Generate complex types");
     let complex_types: TokenStream = self
       .complex_type
       .iter()
@@ -66,19 +63,9 @@ impl Implementation for Schema {
 
     quote!(
       pub mod types {
-          use yaserde::{YaDeserialize, YaSerialize};
-          use yaserde_derive::{YaDeserialize, YaSerialize};
-          use std::io::{Read, Write};
-          use xml::reader::{EventReader, XmlEvent};
-
-          #simple_types
-          #complex_types
+        #simple_types
+        #complex_types
       }
-
-      use yaserde::{YaDeserialize, YaSerialize};
-      use yaserde_derive::{YaDeserialize, YaSerialize};
-      use std::io::{Read, Write};
-      use xml::reader::{EventReader, XmlEvent};
 
       #elements
     )
@@ -117,7 +104,7 @@ mod tests {
         .unwrap();
 
     let implementation = format!("{}", schema.implement(&TokenStream::new(), &None, &context));
-    assert_eq!(implementation, "pub mod types { use yaserde :: { YaDeserialize , YaSerialize } ; use yaserde_derive :: { YaDeserialize , YaSerialize } ; use std :: io :: { Read , Write } ; use xml :: reader :: { EventReader , XmlEvent } ; } use yaserde :: { YaDeserialize , YaSerialize } ; use yaserde_derive :: { YaDeserialize , YaSerialize } ; use std :: io :: { Read , Write } ; use xml :: reader :: { EventReader , XmlEvent } ;");
+    assert_eq!(implementation, "pub mod types { }");
   }
 
   #[test]

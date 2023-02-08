@@ -3,11 +3,8 @@ use crate::xsd::{
   rust_types_mapping::RustTypesMapping, simple_type::SimpleType, Implementation, XsdContext,
 };
 use heck::{CamelCase, SnakeCase};
-use log::{debug, info};
 use proc_macro2::{Span, TokenStream};
-use std::io::prelude::*;
 use syn::Ident;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
@@ -76,7 +73,7 @@ impl Implementation for Element {
 
     quote! {
       #docs
-      #[derive(Clone, Debug, Default, PartialEq, YaDeserialize, YaSerialize)]
+      #[derive(Clone, Debug, Default, PartialEq, yaserde_derive::YaDeserialize, yaserde_derive::YaSerialize)]
       #namespace_definition
       pub struct #struct_name {
         #fields
@@ -117,7 +114,7 @@ impl Element {
       self.name.to_snake_case()
     };
 
-    info!("Generate element {:?}", name);
+    log::info!("Generate element {:?}", name);
 
     let name = if multiple { format!("{}s", name) } else { name };
 
@@ -167,7 +164,7 @@ mod tests {
   use super::*;
 
   static DERIVES: &str =
-    "# [derive (Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize)] ";
+    "# [derive (Clone , Debug , Default , PartialEq , yaserde_derive :: YaDeserialize , yaserde_derive :: YaSerialize)] ";
 
   static DOCS: &str = r#"# [doc = "Loudness measured in Decibels"] "#;
 

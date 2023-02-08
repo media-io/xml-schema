@@ -1,10 +1,7 @@
 use crate::xsd::{list::List, restriction::Restriction, union::Union, Implementation, XsdContext};
 use heck::CamelCase;
-use log::debug;
 use proc_macro2::{Span, TokenStream};
-use std::io::prelude::*;
 use syn::Ident;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
@@ -30,7 +27,7 @@ impl Implementation for SimpleType {
     }
 
     quote!(
-      #[derive(Clone, Debug, Default, PartialEq, YaDeserialize, YaSerialize)]
+      #[derive(Clone, Debug, Default, PartialEq, yaserde_derive::YaDeserialize, yaserde_derive::YaSerialize)]
       #namespace_definition
       pub struct #struct_name {
         #[yaserde(text)]
@@ -59,7 +56,7 @@ mod tests {
   use super::*;
 
   static DERIVES: &str =
-    "# [derive (Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize)] ";
+    "# [derive (Clone , Debug , Default , PartialEq , yaserde_derive :: YaDeserialize , yaserde_derive :: YaSerialize)] ";
 
   #[test]
   fn simple_type() {

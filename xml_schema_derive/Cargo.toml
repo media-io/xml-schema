@@ -24,5 +24,5 @@ reqwest = { version = "0.10", features = ["blocking"] }
 simple_logger = "1.6"
 syn = { version = "1.0", features = ["visit", "extra-traits"] }
 xml-rs = "0.8"
-yaserde_derive = { version = "0.4" }
-yaserde = { version = "0.4" }
+yaserde_derive = { version = "0.8" }
+yaserde = { version = "0.8" }

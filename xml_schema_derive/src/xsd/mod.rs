@@ -19,7 +19,6 @@ mod union;
 mod xsd_context;
 
 use heck::SnakeCase;
-use log::info;
 use proc_macro2::{Ident, TokenStream};
 use std::collections::BTreeMap;
 use std::fs;
@@ -82,14 +81,14 @@ impl Xsd {
     module_namespace_mappings: &BTreeMap<String, String>,
   ) -> Result<Self, String> {
     let content = if source.starts_with("http://") || source.starts_with("https://") {
-      info!("Load HTTP schema {}", source);
+      log::info!("Load HTTP schema {}", source);
       reqwest::blocking::get(source)
         .map_err(|e| e.to_string())?
         .text()
         .map_err(|e| e.to_string())?
     } else {
       let path = std::env::current_dir().unwrap();
-      info!("The current directory is {}", path.display());
+      log::info!("The current directory is {}", path.display());
 
       fs::read_to_string(source).map_err(|e| e.to_string())?
     };

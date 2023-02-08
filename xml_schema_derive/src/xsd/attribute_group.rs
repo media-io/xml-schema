@@ -1,6 +1,4 @@
 use crate::xsd::attribute::Attribute;
-use std::io::Read;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
