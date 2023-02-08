@@ -1,8 +1,5 @@
 use crate::xsd::{attribute::Attribute, Implementation, XsdContext};
-use log::info;
 use proc_macro2::TokenStream;
-use std::io::prelude::*;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
@@ -30,7 +27,7 @@ impl Implementation for Annotation {
     _prefix: &Option<String>,
     _context: &XsdContext,
   ) -> TokenStream {
-    info!("Generate annotation");
+    log::info!("Generate annotation");
 
     let documentation = self
       .documentation

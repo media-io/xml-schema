@@ -1,4 +1,4 @@
-use std::io::prelude::*;
+use std::io::Read;
 use xml::reader::XmlEvent;
 use yaserde::YaDeserialize;
 

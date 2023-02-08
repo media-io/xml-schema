@@ -1,8 +1,6 @@
 use crate::xsd::{element::Element, Implementation, XsdContext};
-use log::{debug, info};
+use log::info;
 use proc_macro2::TokenStream;
-use std::io::prelude::*;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
@@ -22,7 +20,7 @@ impl Implementation for Sequence {
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix, false))
+      .map(|element| element.get_field_implementation(context, prefix))
       .collect()
   }
 }
@@ -50,7 +48,7 @@ impl Sequence {
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix, true))
+      .map(|element| element.get_field_implementation(context, prefix))
       .collect()
   }
 }

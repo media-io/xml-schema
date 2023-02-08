@@ -1,7 +1,3 @@
-use log::debug;
-use std::io::prelude::*;
-use yaserde::YaDeserialize;
-
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
   root="schema"

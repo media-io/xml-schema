@@ -2,10 +2,7 @@ use crate::xsd::{
   attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence, Implementation,
   XsdContext,
 };
-use log::debug;
 use proc_macro2::TokenStream;
-use std::io::prelude::*;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
@@ -34,7 +31,7 @@ impl Implementation for Extension {
     let attributes: TokenStream = self
       .attributes
       .iter()
-      .map(|attribute| attribute.implement(&namespace_definition, prefix, context))
+      .map(|attribute| attribute.implement(namespace_definition, prefix, context))
       .collect();
 
     let inner_attribute = if format!("{}", rust_type) == "String" {
@@ -81,7 +78,7 @@ mod tests {
     let ts = st
       .implement(&TokenStream::new(), &None, &context)
       .to_string();
-    assert!(ts == "# [ yaserde ( text ) ] pub content : String ,");
+    assert!(ts == "# [yaserde (text)] pub content : String ,");
   }
 
   #[test]
@@ -116,6 +113,6 @@ mod tests {
     let ts = st
       .implement(&TokenStream::new(), &None, &context)
       .to_string();
-    assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] pub attribute_1 : String , # [ yaserde ( attribute ) ] pub attribute_2 : Option < bool > ,");
+    assert!(ts == "# [yaserde (text)] pub content : String , # [yaserde (attribute)] pub attribute_1 : String , # [yaserde (attribute)] pub attribute_2 : Option < bool > ,");
   }
 }
