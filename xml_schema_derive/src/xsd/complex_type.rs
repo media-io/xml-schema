@@ -37,7 +37,7 @@ impl Implementation for ComplexType {
     context: &XsdContext,
   ) -> TokenStream {
     let struct_name = Ident::new(
-      &self.name.replace(".", "_").to_camel_case(),
+      &self.name.replace('.', "_").to_camel_case(),
       Span::call_site(),
     );
     info!("Generate sequence");
@@ -69,19 +69,19 @@ impl Implementation for ComplexType {
     let attributes: TokenStream = self
       .attributes
       .iter()
-      .map(|attribute| attribute.implement(&namespace_definition, prefix, context))
+      .map(|attribute| attribute.implement(namespace_definition, prefix, context))
       .collect();
 
     let sub_types_implementation = self
       .sequence
       .as_ref()
-      .map(|sequence| sequence.get_sub_types_implementation(context, &namespace_definition, prefix))
+      .map(|sequence| sequence.get_sub_types_implementation(context, namespace_definition, prefix))
       .unwrap_or_else(TokenStream::new);
 
     let docs = self
       .annotation
       .as_ref()
-      .map(|annotation| annotation.implement(&namespace_definition, prefix, context))
+      .map(|annotation| annotation.implement(namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
     quote! {

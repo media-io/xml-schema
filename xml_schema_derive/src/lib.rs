@@ -12,11 +12,11 @@ mod xsd;
 pub fn xml_schema_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
   let ast = match syn::parse(input) {
     Ok(ast) => ast,
-    Err(msg) => panic!(msg),
+    Err(msg) => panic!("{}", msg),
   };
 
   match expander::expand_derive(&ast) {
     Ok(expanded) => expanded.into(),
-    Err(msg) => panic!(msg),
+    Err(msg) => panic!("{}", msg),
   }
 }

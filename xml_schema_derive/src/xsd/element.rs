@@ -38,7 +38,7 @@ impl Implementation for Element {
     context: &XsdContext,
   ) -> TokenStream {
     let struct_name = Ident::new(
-      &self.name.replace(".", "_").to_camel_case(),
+      &self.name.replace('.', "_").to_camel_case(),
       Span::call_site(),
     );
 
@@ -71,7 +71,7 @@ impl Implementation for Element {
     let docs = self
       .annotation
       .as_ref()
-      .map(|annotation| annotation.implement(&namespace_definition, prefix, context))
+      .map(|annotation| annotation.implement(namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
     quote! {
@@ -107,7 +107,7 @@ impl Element {
     prefix: &Option<String>,
     multiple: bool,
   ) -> TokenStream {
-    if self.name == "" {
+    if self.name.is_empty() {
       return quote!();
     }
 

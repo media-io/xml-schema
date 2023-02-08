@@ -18,7 +18,7 @@ impl Restriction {
     _prefix: &Option<String>,
   ) -> TokenStream {
     if let Some(base) = &self.base {
-      RustTypesMapping::get(context, &base)
+      RustTypesMapping::get(context, base)
     } else {
       panic!("Missing base for restriction");
     }

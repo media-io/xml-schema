@@ -110,8 +110,10 @@ mod tests {
   #[test]
   #[should_panic]
   fn missing_prefix() {
-    let mut schema = Schema::default();
-    schema.target_namespace = Some("http://example.com".to_string());
+    let schema = Schema {
+      target_namespace: Some("http://example.com".to_string()),
+      ..Default::default()
+    };
 
     let context =
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)

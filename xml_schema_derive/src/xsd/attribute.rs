@@ -71,8 +71,8 @@ impl Implementation for Attribute {
       self.kind.as_ref(),
       self.simple_type.as_ref(),
     ) {
-      (None, Some(kind), None) => RustTypesMapping::get(context, &kind),
-      (Some(reference), None, None) => RustTypesMapping::get(context, &reference),
+      (None, Some(kind), None) => RustTypesMapping::get(context, kind),
+      (Some(reference), None, None) => RustTypesMapping::get(context, reference),
       (None, None, Some(simple_type)) => simple_type.get_type_implementation(context, prefix),
       (_, _, _) => panic!("Not implemented Rust type for: {:?}", self),
     };

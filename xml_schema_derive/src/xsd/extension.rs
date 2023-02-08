@@ -34,7 +34,7 @@ impl Implementation for Extension {
     let attributes: TokenStream = self
       .attributes
       .iter()
-      .map(|attribute| attribute.implement(&namespace_definition, prefix, context))
+      .map(|attribute| attribute.implement(namespace_definition, prefix, context))
       .collect();
 
     let inner_attribute = if format!("{}", rust_type) == "String" {
