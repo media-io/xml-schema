@@ -20,7 +20,7 @@ impl Implementation for Sequence {
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix, false))
+      .map(|element| element.get_field_implementation(context, prefix))
       .collect()
   }
 }
@@ -48,7 +48,7 @@ impl Sequence {
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix, true))
+      .map(|element| element.get_field_implementation(context, prefix))
       .collect()
   }
 }
