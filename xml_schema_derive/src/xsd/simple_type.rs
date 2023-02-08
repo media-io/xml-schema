@@ -59,7 +59,7 @@ mod tests {
   use super::*;
 
   static DERIVES: &str =
-    "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] ";
+    "# [derive (Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize)] ";
 
   #[test]
   fn simple_type() {
@@ -78,7 +78,7 @@ mod tests {
 
     assert_eq!(
       format!(
-        "{}pub struct Test {{ # [ yaserde ( text ) ] pub content : std :: string :: String , }}",
+        "{}pub struct Test {{ # [yaserde (text)] pub content : std :: string :: String , }}",
         DERIVES
       ),
       ts

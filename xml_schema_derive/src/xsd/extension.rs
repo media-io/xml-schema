@@ -81,7 +81,7 @@ mod tests {
     let ts = st
       .implement(&TokenStream::new(), &None, &context)
       .to_string();
-    assert!(ts == "# [ yaserde ( text ) ] pub content : String ,");
+    assert!(ts == "# [yaserde (text)] pub content : String ,");
   }
 
   #[test]
@@ -116,6 +116,6 @@ mod tests {
     let ts = st
       .implement(&TokenStream::new(), &None, &context)
       .to_string();
-    assert!(ts == "# [ yaserde ( text ) ] pub content : String , # [ yaserde ( attribute ) ] pub attribute_1 : String , # [ yaserde ( attribute ) ] pub attribute_2 : Option < bool > ,");
+    assert!(ts == "# [yaserde (text)] pub content : String , # [yaserde (attribute)] pub attribute_1 : String , # [yaserde (attribute)] pub attribute_2 : Option < bool > ,");
   }
 }
