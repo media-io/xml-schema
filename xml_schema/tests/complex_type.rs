@@ -1,12 +1,6 @@
-#[macro_use]
-extern crate yaserde_derive;
-
-use log::debug;
-use std::io::prelude::*;
 use xml_schema_derive::XmlSchema;
 use yaserde::de::from_str;
 use yaserde::ser::to_string;
-use yaserde::{YaDeserialize, YaSerialize};
 
 #[test]
 fn complex_type_string() {
@@ -22,9 +16,9 @@ fn complex_type_string() {
   </ComplexListOfElements>
   "#;
 
-  let sample_1: ComplexListOfElements = from_str(xml_1).unwrap();
+  let sample_1: types::ComplexListOfElements = from_str(xml_1).unwrap();
 
-  let model = ComplexListOfElements {
+  let model = types::ComplexListOfElements {
     annotation: Some("Test content".to_string()),
     label: "Label content".to_string(),
   };
