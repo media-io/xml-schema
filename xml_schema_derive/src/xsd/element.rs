@@ -164,11 +164,12 @@ impl Element {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use std::str::FromStr;
 
   static DERIVES: &str =
-    "# [derive (Clone , Debug , Default , PartialEq , yaserde_derive :: YaDeserialize , yaserde_derive :: YaSerialize)] ";
+    "#[derive(Clone, Debug, Default, PartialEq, yaserde_derive::YaDeserialize, yaserde_derive::YaSerialize)]";
 
-  static DOCS: &str = r#"# [doc = "Loudness measured in Decibels"] "#;
+  static DOCS: &str = r#"#[doc = "Loudness measured in Decibels"]"#;
 
   #[test]
   fn extern_type() {
@@ -191,15 +192,20 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = element.implement(&quote!(), &None, &context);
+    let implementation = element.implement(&quote!(), &None, &context);
 
-    assert_eq!(
-      ts.to_string(),
-      format!(
-        "{}{}pub struct Volume {{ # [yaserde (flatten)] pub content : types :: VolumeType , }}",
+    let expected =
+      TokenStream::from_str(&format!(r#"
+        {}
+        {}
+        pub struct Volume {{
+          #[yaserde(flatten)]
+          pub content: types::VolumeType,
+        }}"#,
         DOCS, DERIVES
-      )
-    );
+      )).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 
   #[test]
@@ -223,14 +229,19 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = element.implement(&quote!(), &None, &context);
+    let implementation = element.implement(&quote!(), &None, &context);
 
-    assert_eq!(
-      ts.to_string(),
-      format!(
-        "{}{}pub struct Volume {{ # [yaserde (text)] pub content : types :: String , }}",
+    let expected =
+      TokenStream::from_str(&format!(r#"
+        {}
+        {}
+        pub struct Volume {{
+          #[yaserde(text)]
+          pub content: types::String,
+        }}"#,
         DOCS, DERIVES
-      )
-    );
+      )).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 }

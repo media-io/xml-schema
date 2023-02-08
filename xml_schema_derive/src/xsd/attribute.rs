@@ -96,6 +96,7 @@ impl Implementation for Attribute {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use std::str::FromStr;
 
   #[test]
   fn default_required() {
@@ -116,14 +117,15 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = format!(
-      "{}",
-      attribute.implement(&TokenStream::new(), &None, &context)
-    );
-    assert_eq!(
-      implementation,
-      r#"# [yaserde (attribute)] pub language : String ,"#
-    );
+    let implementation = attribute.implement(&TokenStream::new(), &None, &context);
+
+    let expected =
+      TokenStream::from_str(r#"
+        #[yaserde(attribute)]
+        pub language: String,
+      "#).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 
   #[test]
@@ -140,14 +142,15 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = format!(
-      "{}",
-      attribute.implement(&TokenStream::new(), &None, &context)
-    );
-    assert_eq!(
-      implementation,
-      r#"# [yaserde (attribute)] pub language : Option < String > ,"#
-    );
+    let implementation = attribute.implement(&TokenStream::new(), &None, &context);
+
+    let expected =
+      TokenStream::from_str(r#"
+        #[yaserde(attribute)]
+        pub language: Option<String> ,
+      "#).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 
   #[test]
@@ -164,14 +167,15 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = format!(
-      "{}",
-      attribute.implement(&TokenStream::new(), &None, &context)
-    );
-    assert_eq!(
-      implementation,
-      r#"# [yaserde (attribute , rename = "type")] pub kind : Option < String > ,"#
-    );
+    let implementation = attribute.implement(&TokenStream::new(), &None, &context);
+
+    let expected =
+      TokenStream::from_str(r#"
+        #[yaserde(attribute, rename="type")]
+        pub kind: Option<String> ,
+      "#).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 
   #[test]
@@ -188,14 +192,15 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = format!(
-      "{}",
-      attribute.implement(&TokenStream::new(), &None, &context)
-    );
-    assert_eq!(
-      implementation,
-      r#"# [yaserde (attribute , rename = "type")] pub kind : Option < MyType > ,"#
-    );
+    let implementation = attribute.implement(&TokenStream::new(), &None, &context);
+
+    let expected =
+      TokenStream::from_str(r#"
+        #[yaserde(attribute, rename="type")]
+        pub kind: Option<MyType> ,
+      "#).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 
   #[test]
@@ -230,10 +235,7 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = format!(
-      "{}",
-      attribute.implement(&TokenStream::new(), &None, &context)
-    );
-    assert_eq!(implementation, "".to_string());
+    let implementation = attribute.implement(&TokenStream::new(), &None, &context).to_string();
+    assert!(implementation.is_empty());
   }
 }

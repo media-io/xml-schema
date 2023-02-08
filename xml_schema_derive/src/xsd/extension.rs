@@ -62,6 +62,7 @@ impl Extension {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use std::str::FromStr;
 
   #[test]
   fn extension() {
@@ -75,10 +76,15 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = st
-      .implement(&TokenStream::new(), &None, &context)
-      .to_string();
-    assert!(ts == "# [yaserde (text)] pub content : String ,");
+    let implementation = st.implement(&TokenStream::new(), &None, &context);
+
+    let expected =
+      TokenStream::from_str(r#"
+        #[yaserde(text)]
+        pub content: String,
+      "#).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 
   #[test]
@@ -110,9 +116,18 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = st
-      .implement(&TokenStream::new(), &None, &context)
-      .to_string();
-    assert!(ts == "# [yaserde (text)] pub content : String , # [yaserde (attribute)] pub attribute_1 : String , # [yaserde (attribute)] pub attribute_2 : Option < bool > ,");
+    let implementation = st.implement(&TokenStream::new(), &None, &context);
+
+    let expected =
+      TokenStream::from_str(r#"
+        #[yaserde(text)]
+        pub content: String,
+        #[yaserde(attribute)]
+        pub attribute_1: String,
+        #[yaserde(attribute)]
+        pub attribute_2: Option<bool> ,
+      "#).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 }
