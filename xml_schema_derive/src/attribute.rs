@@ -34,6 +34,10 @@ impl XmlSchemaAttribute {
     let mut target_prefix = None;
 
     for attr in attrs.iter() {
+      if !attr.path.is_ident("xml_schema") {
+        continue;
+      }
+
       let mut attr_iter = attr.clone().tokens.into_iter();
       if let Some(TokenTree::Group(group)) = attr_iter.next() {
         if group.delimiter() == Delimiter::Parenthesis {
@@ -112,7 +116,7 @@ mod tests {
   fn generate_attributes(content: &str) -> Vec<Attribute> {
     let mut punctuated = Punctuated::new();
     punctuated.push(PathSegment {
-      ident: Ident::new("yaserde", Span::call_site()),
+      ident: Ident::new("xml_schema", Span::call_site()),
       arguments: PathArguments::None,
     });
 
