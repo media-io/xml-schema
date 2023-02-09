@@ -119,11 +119,13 @@ mod tests {
 
     let implementation = attribute.implement(&TokenStream::new(), &None, &context);
 
-    let expected =
-      TokenStream::from_str(r#"
+    let expected = TokenStream::from_str(
+      r#"
         #[yaserde(attribute)]
         pub language: String,
-      "#).unwrap();
+      "#,
+    )
+    .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
   }
@@ -144,11 +146,13 @@ mod tests {
 
     let implementation = attribute.implement(&TokenStream::new(), &None, &context);
 
-    let expected =
-      TokenStream::from_str(r#"
+    let expected = TokenStream::from_str(
+      r#"
         #[yaserde(attribute)]
         pub language: Option<String> ,
-      "#).unwrap();
+      "#,
+    )
+    .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
   }
@@ -169,11 +173,13 @@ mod tests {
 
     let implementation = attribute.implement(&TokenStream::new(), &None, &context);
 
-    let expected =
-      TokenStream::from_str(r#"
+    let expected = TokenStream::from_str(
+      r#"
         #[yaserde(attribute, rename="type")]
         pub kind: Option<String> ,
-      "#).unwrap();
+      "#,
+    )
+    .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
   }
@@ -194,11 +200,13 @@ mod tests {
 
     let implementation = attribute.implement(&TokenStream::new(), &None, &context);
 
-    let expected =
-      TokenStream::from_str(r#"
+    let expected = TokenStream::from_str(
+      r#"
         #[yaserde(attribute, rename="type")]
         pub kind: Option<MyType> ,
-      "#).unwrap();
+      "#,
+    )
+    .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
   }
@@ -235,7 +243,9 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = attribute.implement(&TokenStream::new(), &None, &context).to_string();
+    let implementation = attribute
+      .implement(&TokenStream::new(), &None, &context)
+      .to_string();
     assert!(implementation.is_empty());
   }
 }

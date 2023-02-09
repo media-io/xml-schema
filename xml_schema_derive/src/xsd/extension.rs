@@ -78,11 +78,13 @@ mod tests {
 
     let implementation = st.implement(&TokenStream::new(), &None, &context);
 
-    let expected =
-      TokenStream::from_str(r#"
+    let expected = TokenStream::from_str(
+      r#"
         #[yaserde(text)]
         pub content: String,
-      "#).unwrap();
+      "#,
+    )
+    .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
   }
@@ -118,15 +120,17 @@ mod tests {
 
     let implementation = st.implement(&TokenStream::new(), &None, &context);
 
-    let expected =
-      TokenStream::from_str(r#"
+    let expected = TokenStream::from_str(
+      r#"
         #[yaserde(text)]
         pub content: String,
         #[yaserde(attribute)]
         pub attribute_1: String,
         #[yaserde(attribute)]
         pub attribute_2: Option<bool> ,
-      "#).unwrap();
+      "#,
+    )
+    .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
   }

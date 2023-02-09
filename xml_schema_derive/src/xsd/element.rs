@@ -194,16 +194,17 @@ mod tests {
 
     let implementation = element.implement(&quote!(), &None, &context);
 
-    let expected =
-      TokenStream::from_str(&format!(r#"
+    let expected = TokenStream::from_str(&format!(
+      r#"
         {}
         {}
         pub struct Volume {{
           #[yaserde(flatten)]
           pub content: types::VolumeType,
         }}"#,
-        DOCS, DERIVES
-      )).unwrap();
+      DOCS, DERIVES
+    ))
+    .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
   }
@@ -231,16 +232,17 @@ mod tests {
 
     let implementation = element.implement(&quote!(), &None, &context);
 
-    let expected =
-      TokenStream::from_str(&format!(r#"
+    let expected = TokenStream::from_str(&format!(
+      r#"
         {}
         {}
         pub struct Volume {{
           #[yaserde(text)]
           pub content: types::String,
         }}"#,
-        DOCS, DERIVES
-      )).unwrap();
+      DOCS, DERIVES
+    ))
+    .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
   }

@@ -85,7 +85,8 @@ mod tests {
 
     let struct_name = Ident::new("Parent", Span::call_site());
 
-    let implementation = list_type.implement_childs(&TokenStream::new(), &None, &context, &struct_name);
+    let implementation =
+      list_type.implement_childs(&TokenStream::new(), &None, &context, &struct_name);
 
     let expected =
       TokenStream::from_str(r#"
