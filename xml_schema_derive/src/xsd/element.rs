@@ -118,7 +118,7 @@ impl Element {
 
     log::info!("Generate element {:?}", name);
 
-    let name = if multiple { format!("{}s", name) } else { name };
+    let name = if multiple { format!("{name}s") } else { name };
 
     let attribute_name = Ident::new(&name, Span::call_site());
     let yaserde_rename = &self.name;
@@ -196,13 +196,12 @@ mod tests {
 
     let expected = TokenStream::from_str(&format!(
       r#"
-        {}
-        {}
+        {DOCS}
+        {DERIVES}
         pub struct Volume {{
           #[yaserde(flatten)]
           pub content: types::VolumeType,
-        }}"#,
-      DOCS, DERIVES
+        }}"#
     ))
     .unwrap();
 
@@ -234,13 +233,12 @@ mod tests {
 
     let expected = TokenStream::from_str(&format!(
       r#"
-        {}
-        {}
+        {DOCS}
+        {DERIVES}
         pub struct Volume {{
           #[yaserde(text)]
           pub content: types::String,
-        }}"#,
-      DOCS, DERIVES
+        }}"#
     ))
     .unwrap();
 

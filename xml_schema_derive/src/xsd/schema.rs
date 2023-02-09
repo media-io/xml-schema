@@ -85,7 +85,7 @@ fn generate_namespace_definition(
       "a prefix attribute, but no target namespace is defined, please remove the prefix parameter"
     ),
     (Some(prefix), Some(target_namespace)) => {
-      let namespace = format!("{}: {}", prefix, target_namespace);
+      let namespace = format!("{prefix}: {target_namespace}");
       quote!(#[yaserde(prefix=#prefix, namespace=#namespace)])
     }
   }
@@ -141,7 +141,7 @@ mod tests {
       &Some("http://example.com".to_string()),
     );
 
-    let implementation = format!("{}", definition);
+    let implementation = format!("{definition}");
 
     assert_eq!(
       implementation,

@@ -54,6 +54,7 @@ impl SimpleType {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use std::str::FromStr;
 
   static DERIVES: &str =
     "# [derive (Clone , Debug , Default , PartialEq , yaserde_derive :: YaDeserialize , yaserde_derive :: YaSerialize)] ";
@@ -71,15 +72,18 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = st.implement(&quote!(), &None, &context).to_string();
+    let implementation = st.implement(&quote!(), &None, &context);
 
-    assert_eq!(
-      format!(
-        "{}pub struct Test {{ # [yaserde (text)] pub content : std :: string :: String , }}",
-        DERIVES
-      ),
-      ts
-    );
+    let expected = TokenStream::from_str(&format!(
+      r#"{DERIVES}
+        pub struct Test {{
+          #[yaserde(text)]
+          pub content: std::string::String,
+        }}"#,
+    ))
+    .unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 
   // <!-- Whitespace-separated list of strings -->

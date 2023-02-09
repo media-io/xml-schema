@@ -84,7 +84,7 @@ impl RustTypesMapping {
 
     let default_module = context
       .get_module("")
-      .map(|module| format!("{}::", module))
+      .map(|module| format!("{module}::"))
       .unwrap_or_else(|| "".to_string());
 
     let module = if items.len() == 2 {
@@ -98,7 +98,7 @@ impl RustTypesMapping {
       default_module
     };
 
-    let struct_name = format!("{}{}", module, struct_name);
+    let struct_name = format!("{module}{struct_name}");
     let struct_name = parse_str::<TypePath>(&struct_name).unwrap();
     quote!(#struct_name)
   }
