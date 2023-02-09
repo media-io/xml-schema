@@ -3,11 +3,8 @@ use crate::xsd::{
   rust_types_mapping::RustTypesMapping, simple_type::SimpleType, Implementation, XsdContext,
 };
 use heck::{CamelCase, SnakeCase};
-use log::{debug, info};
 use proc_macro2::{Span, TokenStream};
-use std::io::prelude::*;
 use syn::Ident;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
@@ -38,7 +35,7 @@ impl Implementation for Element {
     context: &XsdContext,
   ) -> TokenStream {
     let struct_name = Ident::new(
-      &self.name.replace(".", "_").to_camel_case(),
+      &self.name.replace('.', "_").to_camel_case(),
       Span::call_site(),
     );
 
@@ -54,7 +51,7 @@ impl Implementation for Element {
       (
         quote!(
           #[yaserde(#subtype_mode)]
-          pub content: #extern_type,
+          pub content: types::#extern_type,
         ),
         quote!(),
       )
@@ -71,12 +68,12 @@ impl Implementation for Element {
     let docs = self
       .annotation
       .as_ref()
-      .map(|annotation| annotation.implement(&namespace_definition, prefix, context))
+      .map(|annotation| annotation.implement(namespace_definition, prefix, context))
       .unwrap_or_else(TokenStream::new);
 
     quote! {
       #docs
-      #[derive(Clone, Debug, Default, PartialEq, YaDeserialize, YaSerialize)]
+      #[derive(Clone, Debug, Default, PartialEq, yaserde_derive::YaDeserialize, yaserde_derive::YaSerialize)]
       #namespace_definition
       pub struct #struct_name {
         #fields
@@ -108,9 +105,12 @@ impl Element {
     multiple: bool,
     optional: bool,
   ) -> TokenStream {
-    if self.name == "" {
+    if self.name.is_empty() {
       return quote!();
     }
+
+    let multiple = self.max_occurences.is_some()
+      && self.max_occurences != Some(MaxOccurences::Number { value: 1 });
 
     let name = if self.name.to_lowercase() == "type" {
       "kind".to_string()
@@ -118,7 +118,7 @@ impl Element {
       self.name.to_snake_case()
     };
 
-    info!("Generate element {:?}", name);
+    log::info!("Generate element {:?}", name);
 
     let name = if multiple { format!("{}s", name) } else { name };
 
@@ -144,7 +144,7 @@ impl Element {
       rust_type
     };
 
-    let rust_type = if optional || self.min_occurences == Some(0) {
+    let rust_type = if optional || (!multiple && self.min_occurences == Some(0)) {
       quote!(Option<#rust_type>)
     } else {
       rust_type
@@ -166,11 +166,12 @@ impl Element {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use std::str::FromStr;
 
   static DERIVES: &str =
-    "# [ derive ( Clone , Debug , Default , PartialEq , YaDeserialize , YaSerialize ) ] ";
+    "#[derive(Clone, Debug, Default, PartialEq, yaserde_derive::YaDeserialize, yaserde_derive::YaSerialize)]";
 
-  static DOCS: &str = r#"# [ doc = "Loudness measured in Decibels" ] "#;
+  static DOCS: &str = r#"#[doc = "Loudness measured in Decibels"]"#;
 
   #[test]
   fn extern_type() {
@@ -193,15 +194,20 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = element.implement(&quote!(), &None, &context);
+    let implementation = element.implement(&quote!(), &None, &context);
 
-    assert_eq!(
-      ts.to_string(),
-      format!(
-        "{}{}pub struct Volume {{ # [ yaserde ( flatten ) ] pub content : VolumeType , }}",
+    let expected =
+      TokenStream::from_str(&format!(r#"
+        {}
+        {}
+        pub struct Volume {{
+          #[yaserde(flatten)]
+          pub content: types::VolumeType,
+        }}"#,
         DOCS, DERIVES
-      )
-    );
+      )).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 
   #[test]
@@ -225,14 +231,19 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let ts = element.implement(&quote!(), &None, &context);
+    let implementation = element.implement(&quote!(), &None, &context);
 
-    assert_eq!(
-      ts.to_string(),
-      format!(
-        "{}{}pub struct Volume {{ # [ yaserde ( text ) ] pub content : String , }}",
+    let expected =
+      TokenStream::from_str(&format!(r#"
+        {}
+        {}
+        pub struct Volume {{
+          #[yaserde(text)]
+          pub content: types::String,
+        }}"#,
         DOCS, DERIVES
-      )
-    );
+      )).unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
   }
 }

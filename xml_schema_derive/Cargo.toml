@@ -15,14 +15,17 @@ readme = "../README.md"
 name = "xml_schema_derive"
 proc-macro = true
 
+[features]
+default = ["reqwest/default-tls"]
+
 [dependencies]
 heck = "0.3.1"
 log = "0.4"
 proc-macro2 = "1.0"
 quote = "1.0"
-reqwest = { version = "0.10", features = ["blocking"] }
+reqwest = { version = "0.10", default-features = false, features = ["blocking"] }
 simple_logger = "1.6"
 syn = { version = "1.0", features = ["visit", "extra-traits"] }
 xml-rs = "0.8"
-yaserde_derive = { version = "0.4" }
-yaserde = { version = "0.4" }
+yaserde_derive = { version = "0.8" }
+yaserde = { version = "0.8" }

@@ -1,12 +1,6 @@
-#[macro_use]
-extern crate yaserde_derive;
-
-use log::debug;
-use std::io::prelude::*;
 use xml_schema_derive::XmlSchema;
 use yaserde::de::from_str;
 use yaserde::ser::to_string;
-use yaserde::{YaDeserialize, YaSerialize};
 
 #[test]
 fn simple_type_string() {
@@ -24,9 +18,9 @@ fn simple_type_string() {
   </Sample-type>
   "#;
 
-  let sample_1: SampleType = from_str(xml_1).unwrap();
+  let sample_1: types::SampleType = from_str(xml_1).unwrap();
 
-  let model = SampleType {
+  let model = types::SampleType {
     content: "Test content".to_string(),
   };
 
@@ -44,14 +38,14 @@ fn simple_type_list() {
   <BaseType strings="value1 value2" integers="3 6" booleans="true false" />
   "#;
 
-  let sample_1: BaseType = from_str(xml_1).unwrap();
+  let sample_1: types::BaseType = from_str(xml_1).unwrap();
 
-  let model = BaseType {
-    strings: Some(StringList {
+  let model = types::BaseType {
+    strings: Some(types::StringList {
       items: vec!["value1".to_string(), "value2".to_string()],
     }),
-    integers: Some(IntegerList { items: vec![3, 6] }),
-    booleans: Some(BooleanList {
+    integers: Some(types::IntegerList { items: vec![3, 6] }),
+    booleans: Some(types::BooleanList {
       items: vec![true, false],
     }),
   };
