@@ -1,6 +1,6 @@
 use crate::xsd::{
-  attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence, Implementation,
-  XsdContext,
+  attribute::Attribute, choice::Choice, rust_types_mapping::RustTypesMapping, sequence::Sequence,
+  Implementation, XsdContext,
 };
 use proc_macro2::TokenStream;
 
@@ -17,6 +17,8 @@ pub struct Extension {
   pub attributes: Vec<Attribute>,
   #[yaserde(rename = "sequence")]
   pub sequences: Vec<Sequence>,
+  #[yaserde(rename = "choice")]
+  pub choices: Vec<Choice>,
 }
 
 impl Implementation for Extension {
@@ -70,6 +72,7 @@ mod tests {
       base: "xs:string".to_string(),
       attributes: vec![],
       sequences: vec![],
+      choices: vec![],
     };
 
     let context =
@@ -112,6 +115,7 @@ mod tests {
         },
       ],
       sequences: vec![],
+      choices: vec![],
     };
 
     let context =
