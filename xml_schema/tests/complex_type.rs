@@ -16,9 +16,9 @@ fn complex_type_string() {
   </ComplexListOfElements>
   "#;
 
-  let sample_1: types::ComplexListOfElements = from_str(xml_1).unwrap();
+  let sample_1: xml_schema_types::ComplexListOfElements = from_str(xml_1).unwrap();
 
-  let model = types::ComplexListOfElements {
+  let model = xml_schema_types::ComplexListOfElements {
     annotation: Some("Test content".to_string()),
     label: "Label content".to_string(),
   };

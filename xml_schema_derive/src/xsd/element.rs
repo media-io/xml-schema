@@ -51,7 +51,7 @@ impl Implementation for Element {
       (
         quote!(
           #[yaserde(#subtype_mode)]
-          pub content: types::#extern_type,
+          pub content: xml_schema_types::#extern_type,
         ),
         quote!(),
       )
@@ -154,9 +154,21 @@ impl Element {
       quote!()
     };
 
+    let module = if let Some(kind) = &self.kind {
+      if RustTypesMapping::is_xs_string(context, kind) {
+        quote!()
+      } else if RustTypesMapping::is_xs_int(context, kind) {
+        quote!()
+      } else {
+        quote!(xml_schema_types::)
+      }
+    } else {
+      quote!()
+    };
+
     quote! {
       #[yaserde(rename=#yaserde_rename #prefix_attribute)]
-      pub #attribute_name: #rust_type,
+      pub #attribute_name: #module#rust_type,
     }
   }
 }
@@ -200,7 +212,7 @@ mod tests {
         {DERIVES}
         pub struct Volume {{
           #[yaserde(flatten)]
-          pub content: types::VolumeType,
+          pub content: xml_schema_types::VolumeType,
         }}"#
     ))
     .unwrap();
@@ -237,7 +249,7 @@ mod tests {
         {DERIVES}
         pub struct Volume {{
           #[yaserde(text)]
-          pub content: types::String,
+          pub content: xml_schema_types::String,
         }}"#
     ))
     .unwrap();

@@ -41,6 +41,20 @@ impl RustTypesMapping {
     false
   }
 
+  pub fn is_xs_int(context: &XsdContext, kind: &str) -> bool {
+    let items: Vec<&str> = kind.split(':').collect();
+
+    if items.len() == 2 {
+      if context.match_xml_schema_prefix(items.first().unwrap()) {
+        return *items.last().unwrap() == "int";
+      }
+    } else if items.len() == 1 && !context.has_xml_schema_prefix() {
+      return *items.last().unwrap() == "int";
+    }
+
+    false
+  }
+
   fn basic_type(item: &str) -> TokenStream {
     match item {
       "bool" => quote!(bool),

@@ -18,9 +18,9 @@ fn simple_type_string() {
   </Sample-type>
   "#;
 
-  let sample_1: types::SampleType = from_str(xml_1).unwrap();
+  let sample_1: xml_schema_types::SampleType = from_str(xml_1).unwrap();
 
-  let model = types::SampleType {
+  let model = xml_schema_types::SampleType {
     content: "Test content".to_string(),
   };
 
@@ -38,14 +38,14 @@ fn simple_type_list() {
   <BaseType strings="value1 value2" integers="3 6" booleans="true false" />
   "#;
 
-  let sample_1: types::BaseType = from_str(xml_1).unwrap();
+  let sample_1: xml_schema_types::BaseType = from_str(xml_1).unwrap();
 
-  let model = types::BaseType {
-    strings: Some(types::StringList {
+  let model = xml_schema_types::BaseType {
+    strings: Some(xml_schema_types::StringList {
       items: vec!["value1".to_string(), "value2".to_string()],
     }),
-    integers: Some(types::IntegerList { items: vec![3, 6] }),
-    booleans: Some(types::BooleanList {
+    integers: Some(xml_schema_types::IntegerList { items: vec![3, 6] }),
+    booleans: Some(xml_schema_types::BooleanList {
       items: vec![true, false],
     }),
   };

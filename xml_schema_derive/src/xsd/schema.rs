@@ -62,7 +62,7 @@ impl Implementation for Schema {
       .collect();
 
     quote!(
-      pub mod types {
+      pub mod xml_schema_types {
         #simple_types
         #complex_types
       }
@@ -104,7 +104,7 @@ mod tests {
         .unwrap();
 
     let implementation = format!("{}", schema.implement(&TokenStream::new(), &None, &context));
-    assert_eq!(implementation, "pub mod types { }");
+    assert_eq!(implementation, "pub mod xml_schema_types { }");
   }
 
   #[test]
