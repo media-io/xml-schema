@@ -1,15 +1,10 @@
-#[derive(Clone, Debug, PartialEq, YaDeserialize)]
+#[derive(Clone, Debug, Default, PartialEq, YaDeserialize)]
 pub enum Qualification {
   #[yaserde(rename = "qualified")]
   Qualidified,
+  #[default]
   #[yaserde(rename = "unqualified")]
   Unqualified,
-}
-
-impl Default for Qualification {
-  fn default() -> Self {
-    Qualification::Unqualified
-  }
 }
 
 #[cfg(test)]

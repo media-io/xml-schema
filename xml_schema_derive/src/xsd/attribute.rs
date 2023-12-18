@@ -28,18 +28,13 @@ pub struct Attribute {
   pub simple_type: Option<SimpleType>,
 }
 
-#[derive(Clone, Debug, PartialEq, YaDeserialize)]
+#[derive(Clone, Debug, Default, PartialEq, YaDeserialize)]
 pub enum Required {
+  #[default]
   #[yaserde(rename = "optional")]
   Optional,
   #[yaserde(rename = "required")]
   Required,
-}
-
-impl Default for Required {
-  fn default() -> Self {
-    Required::Optional
-  }
 }
 
 impl Implementation for Attribute {

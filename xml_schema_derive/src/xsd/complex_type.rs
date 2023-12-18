@@ -42,14 +42,14 @@ impl Implementation for ComplexType {
       .sequence
       .as_ref()
       .map(|sequence| sequence.implement(namespace_definition, prefix, context))
-      .unwrap_or_else(TokenStream::new);
+      .unwrap_or_default();
 
     log::info!("Generate simple content");
     let simple_content = self
       .simple_content
       .as_ref()
       .map(|simple_content| simple_content.implement(namespace_definition, prefix, context))
-      .unwrap_or_else(TokenStream::new);
+      .unwrap_or_default();
 
     let complex_content = self
       .complex_content
@@ -61,7 +61,7 @@ impl Implementation for ComplexType {
           #complex_content_type,
         )
       })
-      .unwrap_or_else(TokenStream::new);
+      .unwrap_or_default();
 
     let attributes: TokenStream = self
       .attributes
@@ -73,13 +73,13 @@ impl Implementation for ComplexType {
       .sequence
       .as_ref()
       .map(|sequence| sequence.get_sub_types_implementation(context, namespace_definition, prefix))
-      .unwrap_or_else(TokenStream::new);
+      .unwrap_or_default();
 
     let docs = self
       .annotation
       .as_ref()
       .map(|annotation| annotation.implement(namespace_definition, prefix, context))
-      .unwrap_or_else(TokenStream::new);
+      .unwrap_or_default();
 
     quote! {
       #docs
@@ -109,13 +109,13 @@ impl ComplexType {
         .sequence
         .as_ref()
         .map(|sequence| sequence.get_field_implementation(context, prefix))
-        .unwrap_or_else(TokenStream::new)
+        .unwrap_or_default()
     } else {
       self
         .simple_content
         .as_ref()
         .map(|simple_content| simple_content.get_field_implementation(context, prefix))
-        .unwrap_or_else(TokenStream::new)
+        .unwrap_or_default()
     }
   }
 

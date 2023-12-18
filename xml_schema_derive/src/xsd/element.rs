@@ -69,7 +69,7 @@ impl Implementation for Element {
       .annotation
       .as_ref()
       .map(|annotation| annotation.implement(namespace_definition, prefix, context))
-      .unwrap_or_else(TokenStream::new);
+      .unwrap_or_default();
 
     quote! {
       #docs
@@ -155,9 +155,8 @@ impl Element {
     };
 
     let module = if let Some(kind) = &self.kind {
-      if RustTypesMapping::is_xs_string(context, kind) {
-        quote!()
-      } else if RustTypesMapping::is_xs_int(context, kind) {
+      if RustTypesMapping::is_xs_string(context, kind) || RustTypesMapping::is_xs_int(context, kind)
+      {
         quote!()
       } else {
         quote!(xml_schema_types::)

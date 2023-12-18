@@ -2,16 +2,13 @@ use std::io::Read;
 use xml::reader::XmlEvent;
 use yaserde::YaDeserialize;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub enum MaxOccurences {
+  #[default]
   Unbounded,
-  Number { value: u32 },
-}
-
-impl Default for MaxOccurences {
-  fn default() -> Self {
-    MaxOccurences::Unbounded
-  }
+  Number {
+    value: u32,
+  },
 }
 
 impl YaDeserialize for MaxOccurences {

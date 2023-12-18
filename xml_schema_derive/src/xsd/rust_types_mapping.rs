@@ -99,7 +99,7 @@ impl RustTypesMapping {
     let default_module = context
       .get_module("")
       .map(|module| format!("{module}::"))
-      .unwrap_or_else(|| "".to_string());
+      .unwrap_or_default();
 
     let module = if items.len() == 2 {
       let prefix = items.first().unwrap();
