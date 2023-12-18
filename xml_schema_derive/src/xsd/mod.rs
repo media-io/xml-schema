@@ -18,7 +18,7 @@ mod simple_type;
 mod union;
 mod xsd_context;
 
-use heck::SnakeCase;
+use heck::ToSnakeCase;
 use proc_macro2::{Ident, TokenStream};
 use std::collections::BTreeMap;
 use std::fs;

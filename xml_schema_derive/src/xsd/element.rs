@@ -2,7 +2,7 @@ use crate::xsd::{
   annotation::Annotation, complex_type::ComplexType, max_occurences::MaxOccurences,
   rust_types_mapping::RustTypesMapping, simple_type::SimpleType, Implementation, XsdContext,
 };
-use heck::{CamelCase, SnakeCase};
+use heck::{ToUpperCamelCase, ToSnakeCase};
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 
@@ -35,7 +35,7 @@ impl Implementation for Element {
     context: &XsdContext,
   ) -> TokenStream {
     let struct_name = Ident::new(
-      &self.name.replace('.', "_").to_camel_case(),
+      &self.name.replace('.', "_").to_upper_camel_case(),
       Span::call_site(),
     );
 

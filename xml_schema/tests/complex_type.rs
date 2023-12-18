@@ -9,7 +9,6 @@ fn complex_type_string() {
   struct ComplexTypeSchema;
 
   let xml_1 = r#"
-  <?xml version="1.0" encoding="UTF-8"?>
   <ComplexListOfElements>
     <Annotation>Test content</Annotation>
     <Label>Label content</Label>

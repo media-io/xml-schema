@@ -2,7 +2,7 @@ use crate::xsd::{
   annotation::Annotation, attribute::Attribute, complex_content::ComplexContent,
   sequence::Sequence, simple_content::SimpleContent, Implementation, XsdContext,
 };
-use heck::CamelCase;
+use heck::ToUpperCamelCase;
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 
@@ -34,7 +34,7 @@ impl Implementation for ComplexType {
     context: &XsdContext,
   ) -> TokenStream {
     let struct_name = Ident::new(
-      &self.name.replace('.', "_").to_camel_case(),
+      &self.name.replace('.', "_").to_upper_camel_case(),
       Span::call_site(),
     );
     log::info!("Generate sequence");

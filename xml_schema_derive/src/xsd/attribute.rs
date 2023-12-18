@@ -1,7 +1,7 @@
 use crate::xsd::{
   rust_types_mapping::RustTypesMapping, simple_type::SimpleType, Implementation, XsdContext,
 };
-use heck::SnakeCase;
+use heck::ToSnakeCase;
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 

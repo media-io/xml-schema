@@ -1,5 +1,5 @@
 use crate::xsd::{list::List, restriction::Restriction, union::Union, Implementation, XsdContext};
-use heck::CamelCase;
+use heck::ToUpperCamelCase;
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 
@@ -20,7 +20,7 @@ impl Implementation for SimpleType {
     prefix: &Option<String>,
     context: &XsdContext,
   ) -> TokenStream {
-    let struct_name = Ident::new(&self.name.to_camel_case(), Span::call_site());
+    let struct_name = Ident::new(&self.name.to_upper_camel_case(), Span::call_site());
 
     if let Some(list) = &self.list {
       return list.implement_childs(namespace_definition, prefix, context, &struct_name);

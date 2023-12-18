@@ -12,7 +12,6 @@ fn simple_type_string() {
   struct SimpleTypeSchema;
 
   let xml_1 = r#"
-  <?xml version="1.0" encoding="UTF-8"?>
   <Sample-type>
     Test content
   </Sample-type>
@@ -34,7 +33,6 @@ fn simple_type_list() {
   struct SimpleTypeSchema;
 
   let xml_1 = r#"
-  <?xml version="1.0" encoding="UTF-8"?>
   <BaseType strings="value1 value2" integers="3 6" booleans="true false" />
   "#;
 
