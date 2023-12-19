@@ -6,11 +6,10 @@ pub fn expand_derive(attributes: &XmlSchemaAttributes) -> Result<TokenStream, St
   let _ = simple_logger::init_with_level(attributes.log_level());
   log::info!("{:?}", attributes);
 
-  let name = "Alksjdfjlksdf".to_string();
   let vis = Visibility::Public(Pub::default());
 
   let xsd = Xsd::new_from_file(
-    name,
+    attributes.module_name(),
     vis,
     &attributes.source,
     &attributes.module_namespace_mappings(),

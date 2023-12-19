@@ -2,9 +2,10 @@ use darling::FromDeriveInput;
 use log::Level;
 use std::collections::BTreeMap;
 
-#[derive(Debug, PartialEq, Clone, Default, FromDeriveInput)]
+#[derive(Debug, PartialEq, Clone, FromDeriveInput)]
 #[darling(attributes(xml_schema), forward_attrs(allow, doc, cfg))]
 pub struct XmlSchemaAttributes {
+  ident: syn::Ident,
   pub log_level: Option<String>,
   pub module_namespace_mappings: Option<String>,
   pub source: String,
@@ -13,6 +14,10 @@ pub struct XmlSchemaAttributes {
 }
 
 impl XmlSchemaAttributes {
+  pub fn module_name(&self) -> String {
+    self.ident.to_string()
+  }
+
   pub fn log_level(&self) -> Level {
     match self.log_level.as_deref() {
       Some("error") => Level::Error,
