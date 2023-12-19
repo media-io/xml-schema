@@ -148,22 +148,22 @@ impl Element {
       rust_type
     };
 
-    let prefix_attribute = if let Some(prefix) = prefix {
-      quote!(, prefix=#prefix)
-    } else {
-      quote!()
-    };
+    let prefix_attribute = prefix
+      .as_ref()
+      .map(|prefix| quote!(, prefix=#prefix))
+      .unwrap_or_default();
 
-    let module = if let Some(kind) = &self.kind {
-      if RustTypesMapping::is_xs_string(context, kind) || RustTypesMapping::is_xs_int(context, kind)
-      {
-        quote!()
-      } else {
-        quote!(xml_schema_types::)
-      }
-    } else {
-      quote!()
-    };
+    let module = (!context.is_in_sub_module()
+      && !self
+        .kind
+        .as_ref()
+        .map(|kind| {
+          RustTypesMapping::is_xs_string(context, kind)
+            || RustTypesMapping::is_xs_int(context, kind)
+        })
+        .unwrap_or_default())
+    .then_some(quote!(xml_schema_types::))
+    .unwrap_or_default();
 
     quote! {
       #[yaserde(rename=#yaserde_rename #prefix_attribute)]

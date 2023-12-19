@@ -8,6 +8,7 @@ pub struct XsdContext {
   module_namespace_mappings: BTreeMap<String, String>,
   pub namespace: Namespace,
   xml_schema_prefix: Option<String>,
+  is_in_sub_module: bool,
 }
 
 impl XsdContext {
@@ -30,6 +31,7 @@ impl XsdContext {
               module_namespace_mappings,
               namespace,
               xml_schema_prefix,
+              is_in_sub_module: false,
             });
           }
         }
@@ -68,6 +70,14 @@ impl XsdContext {
           .map(|module| module.to_owned())
       })
       .unwrap_or_else(|| None)
+  }
+
+  pub fn set_is_in_sub_module(&mut self, is_in_sub_module: bool) {
+    self.is_in_sub_module = is_in_sub_module;
+  }
+
+  pub fn is_in_sub_module(&self) -> bool {
+    self.is_in_sub_module
   }
 }
 

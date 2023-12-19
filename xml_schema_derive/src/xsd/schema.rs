@@ -48,18 +48,28 @@ impl Implementation for Schema {
       .collect();
 
     log::info!("Generate simple types");
-    let simple_types: TokenStream = self
-      .simple_type
-      .iter()
-      .map(|simple_type| simple_type.implement(&namespace_definition, target_prefix, context))
-      .collect();
+    let simple_types: TokenStream = {
+      let mut context = context.clone();
+      context.set_is_in_sub_module(true);
+
+      self
+        .simple_type
+        .iter()
+        .map(|simple_type| simple_type.implement(&namespace_definition, target_prefix, &context))
+        .collect()
+    };
 
     log::info!("Generate complex types");
-    let complex_types: TokenStream = self
-      .complex_type
-      .iter()
-      .map(|complex_type| complex_type.implement(&namespace_definition, target_prefix, context))
-      .collect();
+    let complex_types: TokenStream = {
+      let mut context = context.clone();
+      context.set_is_in_sub_module(true);
+
+      self
+        .complex_type
+        .iter()
+        .map(|complex_type| complex_type.implement(&namespace_definition, target_prefix, &context))
+        .collect()
+    };
 
     quote!(
       pub mod xml_schema_types {
