@@ -2,7 +2,7 @@ use crate::xsd::{
   annotation::Annotation, complex_type::ComplexType, max_occurences::MaxOccurences,
   rust_types_mapping::RustTypesMapping, simple_type::SimpleType, Implementation, XsdContext,
 };
-use heck::{ToUpperCamelCase, ToSnakeCase};
+use heck::{ToSnakeCase, ToUpperCamelCase};
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 

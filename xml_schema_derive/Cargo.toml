@@ -19,13 +19,14 @@ proc-macro = true
 default = ["reqwest/default-tls"]
 
 [dependencies]
+darling = "0.20.3"
 heck = "0.4"
 log = "0.4"
 proc-macro2 = "1.0"
 quote = "1.0"
 reqwest = { version = "0.11", default-features = false, features = ["blocking"] }
 simple_logger = "4"
-syn = { version = "1.0", features = ["visit", "extra-traits"] }
+syn = { version = "2.0", features = ["visit", "extra-traits"] }
 xml-rs = "0.8"
 yaserde_derive = { version = "0.8" }
 yaserde = { version = "0.8" }

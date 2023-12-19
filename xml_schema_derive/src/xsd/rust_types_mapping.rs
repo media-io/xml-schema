@@ -93,7 +93,12 @@ impl RustTypesMapping {
     let struct_name = if items.last().unwrap().is_empty() {
       "String".to_string()
     } else {
-      (*items.last().unwrap().replace('.', "_").to_upper_camel_case()).to_string()
+      (*items
+        .last()
+        .unwrap()
+        .replace('.', "_")
+        .to_upper_camel_case())
+      .to_string()
     };
 
     let default_module = context

@@ -1,19 +1,19 @@
-use crate::attribute::XmlSchemaAttribute;
-use crate::xsd::Xsd;
-use log::info;
+use crate::{attribute::XmlSchemaAttributes, xsd::Xsd};
 use proc_macro2::TokenStream;
+use syn::{token::Pub, Visibility};
 
-pub fn expand_derive(ast: &syn::DeriveInput) -> Result<TokenStream, String> {
-  let attributes = XmlSchemaAttribute::parse(&ast.attrs);
-  let _ = simple_logger::init_with_level(attributes.log_level);
+pub fn expand_derive(attributes: &XmlSchemaAttributes) -> Result<TokenStream, String> {
+  let _ = simple_logger::init_with_level(attributes.log_level());
+  log::info!("{:?}", attributes);
 
-  info!("{:?}", attributes);
+  let name = "Alksjdfjlksdf".to_string();
+  let vis = Visibility::Public(Pub::default());
 
   let xsd = Xsd::new_from_file(
-    ast.ident.to_string(),
-    ast.vis.clone(),
+    name,
+    vis,
     &attributes.source,
-    &attributes.module_namespace_mappings,
+    &attributes.module_namespace_mappings(),
   )?;
   let generated = xsd.implement(&attributes.target_prefix);
 
