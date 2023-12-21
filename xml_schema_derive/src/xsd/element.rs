@@ -73,7 +73,7 @@ impl Implementation for Element {
 
     quote! {
       #docs
-      #[derive(Clone, Debug, Default, PartialEq, yaserde_derive::YaDeserialize, yaserde_derive::YaSerialize)]
+      #[derive(Clone, Debug, Default, PartialEq, serde::Deserialize, serde::Serialize)]
       #namespace_definition
       pub struct #struct_name {
         #fields
@@ -121,7 +121,7 @@ impl Element {
     let name = if multiple { format!("{name}s") } else { name };
 
     let attribute_name = Ident::new(&name, Span::call_site());
-    let yaserde_rename = &self.name;
+    let rename = &self.name;
 
     let rust_type = if let Some(complex_type) = &self.complex_type {
       complex_type.get_integrated_implementation(&self.name)
@@ -166,7 +166,7 @@ impl Element {
     .unwrap_or_default();
 
     quote! {
-      #[yaserde(rename=#yaserde_rename #prefix_attribute)]
+      #[serde(rename=#rename #prefix_attribute)]
       pub #attribute_name: #module#rust_type,
     }
   }
@@ -210,7 +210,7 @@ mod tests {
         {DOCS}
         {DERIVES}
         pub struct Volume {{
-          #[yaserde(flatten)]
+          #[serde(flatten)]
           pub content: xml_schema_types::VolumeType,
         }}"#
     ))
