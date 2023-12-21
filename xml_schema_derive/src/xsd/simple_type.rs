@@ -27,12 +27,12 @@ impl Implementation for SimpleType {
     }
 
     quote!(
-      #[derive(Clone, Debug, Default, PartialEq, yaserde_derive::YaDeserialize, yaserde_derive::YaSerialize)]
+      #[derive(Clone, Debug, Default, PartialEq, serde::Deserialize, serde::Serialize)]
       #namespace_definition
-      pub struct #struct_name {
-        #[yaserde(text)]
-        pub content: std::string::String,
-      }
+      pub struct #struct_name (
+        #[serde(rename="$text")]
+        std::string::String
+      );
     )
   }
 }

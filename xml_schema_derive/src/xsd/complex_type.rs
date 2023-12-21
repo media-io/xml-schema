@@ -57,7 +57,7 @@ impl Implementation for ComplexType {
       .map(|complex_content| {
         let complex_content_type = complex_content.get_field_implementation(context, prefix);
         quote!(
-          #[yaserde(flatten)]
+          #[serde(flatten)]
           #complex_content_type,
         )
       })
@@ -84,7 +84,7 @@ impl Implementation for ComplexType {
     quote! {
       #docs
 
-      #[derive(Clone, Debug, Default, PartialEq, yaserde_derive::YaDeserialize, yaserde_derive::YaSerialize)]
+      #[derive(Clone, Debug, Default, PartialEq, serde::Deserialize, serde::Serialize)]
       #namespace_definition
       pub struct #struct_name {
         #sequence

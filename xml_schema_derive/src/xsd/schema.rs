@@ -96,7 +96,7 @@ fn generate_namespace_definition(
     ),
     (Some(prefix), Some(target_namespace)) => {
       let namespace = format!("{prefix}: {target_namespace}");
-      quote!(#[yaserde(prefix=#prefix, namespace=#namespace)])
+      quote!(#[serde(default)])
     }
   }
 }

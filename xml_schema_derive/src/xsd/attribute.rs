@@ -75,14 +75,12 @@ impl Implementation for Attribute {
       quote!(#rust_type)
     };
 
-    let attributes = if name == raw_name {
-      quote!(attribute)
-    } else {
-      quote!(attribute, rename=#raw_name)
-    };
+    let attribute_name = "@".to_string() + &raw_name;
+
+    let attributes = quote!(rename = #attribute_name);
 
     quote!(
-      #[yaserde(#attributes)]
+      #[serde(#attributes)]
       pub #field_name: #rust_type,
     )
   }
