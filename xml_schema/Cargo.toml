@@ -13,6 +13,8 @@ readme = "../README.md"
 exclude = ["/tests"]
 
 [dependencies]
+quick-xml = { version = "0.31.0", features = ["serialize"] }
+serde = { version = "1.0.193", features = ["serde_derive"] }
 xml-schema-derive = { version = "0.3.0", path = "../xml_schema_derive", optional = true }
 
 [dev-dependencies]
