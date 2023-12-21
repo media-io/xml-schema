@@ -101,7 +101,7 @@ impl Element {
   pub fn get_field_implementation(
     &self,
     context: &XsdContext,
-    prefix: &Option<String>,
+    _prefix: &Option<String>,
   ) -> TokenStream {
     if self.name.is_empty() {
       return quote!();
@@ -148,11 +148,6 @@ impl Element {
       rust_type
     };
 
-    let prefix_attribute = prefix
-      .as_ref()
-      .map(|prefix| quote!(, prefix=#prefix))
-      .unwrap_or_default();
-
     let module = (!context.is_in_sub_module()
       && !self
         .kind
@@ -166,7 +161,7 @@ impl Element {
     .unwrap_or_default();
 
     quote! {
-      #[serde(rename=#rename #prefix_attribute)]
+      #[serde(rename=#rename)]
       pub #attribute_name: #module#rust_type,
     }
   }
