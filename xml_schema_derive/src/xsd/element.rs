@@ -118,7 +118,11 @@ impl Element {
 
     log::info!("Generate element {:?}", name);
 
-    let name = if multiple { format!("{name}s") } else { name };
+    let name = if multiple {
+      format!("{name}_list")
+    } else {
+      name
+    };
 
     let attribute_name = Ident::new(&name, Span::call_site());
     let rename = &self.name;
