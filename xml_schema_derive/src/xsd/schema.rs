@@ -1,4 +1,4 @@
-use crate::xsd::{
+  use crate::xsd::{
   attribute, attribute_group, complex_type, element, import, qualification, simple_type,
   Implementation, XsdContext,
 };
@@ -29,6 +29,8 @@ pub struct Schema {
   pub attributes: Vec<attribute::Attribute>,
   #[yaserde(rename = "attributeGroup")]
   pub attribute_group: Vec<attribute_group::AttributeGroup>,
+  #[yaserde(rename = "group")]
+  pub group: Vec<group::Group>,
 }
 
 impl Implementation for Schema {
@@ -71,10 +73,23 @@ impl Implementation for Schema {
         .collect()
     };
 
+    log::info!("Generate groups");
+    let groups: TokenStream = {
+      let mut context = context.clone();
+      context.set_is_in_sub_module(true);
+
+      self
+        .group
+        .iter()
+        .map(|group| group.implement(&namespace_definition, target_prefix, &context))
+        .collect()
+    };
+
     quote!(
       pub mod xml_schema_types {
         #simple_types
         #complex_types
+        #groups
       }
 
       #elements
