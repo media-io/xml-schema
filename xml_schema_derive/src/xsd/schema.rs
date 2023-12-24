@@ -1,5 +1,5 @@
   use crate::xsd::{
-  attribute, attribute_group, complex_type, element, import, qualification, simple_type,
+  attribute, attribute_group, complex_type, element, group, import, qualification, simple_type,
   Implementation, XsdContext,
 };
 use proc_macro2::TokenStream;
