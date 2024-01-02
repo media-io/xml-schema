@@ -83,7 +83,7 @@ impl Choice {
     self
       .element
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix, multiple, optional))
+      .map(|element| element.get_field_implementation(context, prefix, optional))
       .collect()
   }
 }
