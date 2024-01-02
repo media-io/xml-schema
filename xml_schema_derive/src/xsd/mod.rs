@@ -5,6 +5,7 @@ mod complex_content;
 mod complex_type;
 mod element;
 mod extension;
+mod group;
 mod import;
 mod list;
 mod max_occurences;

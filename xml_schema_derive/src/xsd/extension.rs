@@ -1,6 +1,6 @@
 use crate::xsd::{
-  attribute::Attribute, rust_types_mapping::RustTypesMapping, sequence::Sequence, Implementation,
-  XsdContext,
+  attribute::Attribute, group::Group, rust_types_mapping::RustTypesMapping, sequence::Sequence,
+  Implementation, XsdContext,
 };
 use proc_macro2::TokenStream;
 
@@ -17,6 +17,8 @@ pub struct Extension {
   pub attributes: Vec<Attribute>,
   #[yaserde(rename = "sequence")]
   pub sequences: Vec<Sequence>,
+  #[yaserde(rename = "group")]
+  pub group: Option<Group>,
 }
 
 impl Implementation for Extension {
@@ -34,7 +36,7 @@ impl Implementation for Extension {
       .map(|attribute| attribute.implement(namespace_definition, prefix, context))
       .collect();
 
-    let inner_attribute = if format!("{rust_type}") == "String" {
+let inner_attribute = if format!("{rust_type}") == "String" {
       quote!(#[yaserde(text)])
     } else {
       TokenStream::new()
@@ -42,7 +44,7 @@ impl Implementation for Extension {
 
     quote!(
       #inner_attribute
-      pub content: #rust_type,
+      pub base: #rust_type,
       #attributes
     )
   }
@@ -52,10 +54,28 @@ impl Extension {
   pub fn get_field_implementation(
     &self,
     context: &XsdContext,
-    _prefix: &Option<String>,
+    prefix: &Option<String>,
   ) -> TokenStream {
     let rust_type = RustTypesMapping::get(context, &self.base);
-    quote!(pub content : #rust_type)
+
+    let group_content = self
+      .group
+      .as_ref()
+      .map(|group| {
+        let group_type = group.get_type_implementation(context, prefix);
+
+        quote!(
+          ,
+          #[serde(flatten)]
+          pub extension : #group_type
+        )
+      })
+      .unwrap_or_default();
+
+    quote!(
+      pub base : #rust_type
+      #group_content
+    )
   }
 }
 
@@ -70,6 +90,7 @@ mod tests {
       base: "xs:string".to_string(),
       attributes: vec![],
       sequences: vec![],
+      group: None,
     };
 
     let context =
@@ -112,6 +133,7 @@ mod tests {
         },
       ],
       sequences: vec![],
+      group: None,
     };
 
     let context =
