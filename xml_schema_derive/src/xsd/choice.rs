@@ -7,10 +7,8 @@ use crate::xsd::{
   annotation::Annotation, attribute::Attribute, element::Element, max_occurences::MaxOccurences,
   Implementation, XsdContext,
 };
-use log::{debug, info};
+use log::info;
 use proc_macro2::TokenStream;
-use std::io::prelude::*;
-use yaserde::YaDeserialize;
 
 #[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
 #[yaserde(
