@@ -10,6 +10,8 @@ fn choice() {
   #[xml_schema(source = "xml_schema/tests/choice.xsd")]
   struct ChoiceTypeSchema;
 
+  use choice_type_schema::xml_schema_types::*;
+
   let xml_1 = r#"
   <?xml version="1.0" encoding="UTF-8"?>
   <person>
@@ -41,6 +43,8 @@ fn choice_sequence() {
   #[derive(Debug, XmlSchema)]
   #[xml_schema(source = "xml_schema/tests/choice_sequence.xsd")]
   struct ChoiceTypeSchema;
+
+  use choice_type_schema::xml_schema_types::*;
 
   let xml_1 = r#"
   <?xml version="1.0" encoding="UTF-8"?>
