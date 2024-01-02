@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate yaserde_derive;
 
 use xml_schema_derive::XmlSchema;
