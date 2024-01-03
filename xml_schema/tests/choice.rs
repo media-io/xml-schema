@@ -23,7 +23,7 @@ fn choice() {
 
   let model = Person {
     firstname: Some(Firstname {
-      content: "John".to_string(),
+      base: "John".to_string(),
       scope: None,
     }),
     lastname: None,
@@ -59,7 +59,7 @@ fn choice_sequence() {
   let model = Person {
     name: "Doe".to_string(),
     firstname: Some(Firstname {
-      content: "John".to_string(),
+      base: "John".to_string(),
       scope: None,
     }),
     lastname: None,
