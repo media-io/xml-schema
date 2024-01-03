@@ -12,8 +12,7 @@ fn choice() {
 
   use choice_type_schema::xml_schema_types::*;
 
-  let xml_1 = r#"
-  <?xml version="1.0" encoding="UTF-8"?>
+  let xml_1 = r#"<?xml version="1.0" encoding="UTF-8"?>
   <person>
     <firstname>John</firstname>
   </person>
@@ -46,8 +45,7 @@ fn choice_sequence() {
 
   use choice_type_schema::xml_schema_types::*;
 
-  let xml_1 = r#"
-  <?xml version="1.0" encoding="UTF-8"?>
+  let xml_1 = r#"<?xml version="1.0" encoding="UTF-8"?>
   <person>
     <name>Doe</name>
     <firstname>John</firstname>
@@ -80,8 +78,7 @@ fn choice_multiple() {
   #[xml_schema(source = "xml_schema/tests/choice_multiple.xsd")]
   struct ChoiceTypeSchema;
 
-  let xml_1 = r#"
-  <?xml version="1.0" encoding="UTF-8"?>
+  let xml_1 = r#"<?xml version="1.0" encoding="UTF-8"?>
   <person>
     <firstname>John</firstname>
   </person>
