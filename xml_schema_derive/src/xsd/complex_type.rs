@@ -1,5 +1,5 @@
 use crate::xsd::{
-  annotation::Annotation, attribute::Attribute, complex_content::ComplexContent,
+  annotation::Annotation, attribute::Attribute, choice::Choice, complex_content::ComplexContent,
   sequence::Sequence, simple_content::SimpleContent, Implementation, XsdContext,
 };
 use heck::ToUpperCamelCase;
@@ -17,6 +17,7 @@ pub struct ComplexType {
   pub name: String,
   #[yaserde(rename = "attribute")]
   pub attributes: Vec<Attribute>,
+  #[yaserde(rename = "sequence")]
   pub sequence: Option<Sequence>,
   #[yaserde(rename = "simpleContent")]
   pub simple_content: Option<SimpleContent>,
@@ -24,6 +25,8 @@ pub struct ComplexType {
   pub complex_content: Option<ComplexContent>,
   #[yaserde(rename = "annotation")]
   pub annotation: Option<Annotation>,
+  #[yaserde(rename = "choice")]
+  pub choice: Option<Choice>,
 }
 
 impl Implementation for ComplexType {
@@ -69,7 +72,7 @@ impl Implementation for ComplexType {
       .map(|attribute| attribute.implement(namespace_definition, prefix, context))
       .collect();
 
-    let sub_types_implementation = self
+    let sequence_sub_types = self
       .sequence
       .as_ref()
       .map(|sequence| sequence.get_sub_types_implementation(context, namespace_definition, prefix))
@@ -81,6 +84,18 @@ impl Implementation for ComplexType {
       .map(|annotation| annotation.implement(namespace_definition, prefix, context))
       .unwrap_or_default();
 
+    let choice_sub_types = self
+      .choice
+      .as_ref()
+      .map(|choice| choice.get_sub_types_implementation(context, &namespace_definition, prefix))
+      .unwrap_or_else(TokenStream::new);
+
+    let choice_field = self
+      .choice
+      .as_ref()
+      .map(|choice| choice.get_field_implementation(context, prefix))
+      .unwrap_or_else(TokenStream::new);
+
     quote! {
       #docs
 
@@ -90,10 +105,12 @@ impl Implementation for ComplexType {
         #sequence
         #simple_content
         #complex_content
+        #choice_field
         #attributes
       }
 
-      #sub_types_implementation
+      #sequence_sub_types
+      #choice_sub_types
     }
   }
 }
@@ -110,12 +127,20 @@ impl ComplexType {
         .as_ref()
         .map(|sequence| sequence.get_field_implementation(context, prefix))
         .unwrap_or_default()
-    } else {
+    } else if self.simple_content.is_some() {
       self
         .simple_content
         .as_ref()
         .map(|simple_content| simple_content.get_field_implementation(context, prefix))
         .unwrap_or_default()
+    } else if self.choice.is_some() {
+      self
+        .choice
+        .as_ref()
+        .map(|choice| choice.get_field_implementation(context, prefix))
+        .unwrap_or_else(TokenStream::new)
+    } else {
+      TokenStream::new()
     }
   }
 

@@ -102,13 +102,16 @@ impl Element {
     &self,
     context: &XsdContext,
     prefix: &Option<String>,
+    inheritable_multiple: bool,
+    optional: bool,
   ) -> TokenStream {
     if self.name.is_empty() {
       return quote!();
     }
 
-    let multiple = self.max_occurences.is_some()
-      && self.max_occurences != Some(MaxOccurences::Number { value: 1 });
+    let multiple = inheritable_multiple
+      || (self.max_occurences.is_some()
+        && self.max_occurences != Some(MaxOccurences::Number { value: 1 }));
 
     let name = if self.name.to_lowercase() == "type" {
       "kind".to_string()
@@ -146,17 +149,6 @@ impl Element {
       rust_type
     };
 
-    let rust_type = if !multiple && self.min_occurences == Some(0) {
-      quote!(Option<#rust_type>)
-    } else {
-      rust_type
-    };
-
-    let prefix_attribute = prefix
-      .as_ref()
-      .map(|prefix| quote!(, prefix=#prefix))
-      .unwrap_or_default();
-
     let module = (!context.is_in_sub_module()
       && !self
         .kind
@@ -169,9 +161,22 @@ impl Element {
     .then_some(quote!(xml_schema_types::))
     .unwrap_or_default();
 
+    let rust_type = quote!(#module#rust_type);
+
+    let rust_type = if optional || (!multiple && self.min_occurences == Some(0)) {
+      quote!(Option<#rust_type>)
+    } else {
+      rust_type
+    };
+
+    let prefix_attribute = prefix
+      .as_ref()
+      .map(|prefix| quote!(, prefix=#prefix))
+      .unwrap_or_default();
+
     quote! {
       #[yaserde(rename=#yaserde_rename #prefix_attribute)]
-      pub #attribute_name: #module#rust_type,
+      pub #attribute_name: #rust_type,
     }
   }
 }
