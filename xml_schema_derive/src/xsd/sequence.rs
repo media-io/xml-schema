@@ -22,7 +22,7 @@ impl Implementation for Sequence {
     let elements: TokenStream = self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix, false))
+      .map(|element| element.get_field_implementation(context, prefix, false, false))
       .collect();
 
     let choices: TokenStream = self
@@ -61,7 +61,7 @@ impl Sequence {
     let elements: TokenStream = self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix, false))
+      .map(|element| element.get_field_implementation(context, prefix, false, false))
       .collect();
 
     let choices: TokenStream = self

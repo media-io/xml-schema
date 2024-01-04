@@ -102,14 +102,16 @@ impl Element {
     &self,
     context: &XsdContext,
     prefix: &Option<String>,
+    inheritable_multiple: bool,
     optional: bool,
   ) -> TokenStream {
     if self.name.is_empty() {
       return quote!();
     }
 
-    let multiple = self.max_occurences.is_some()
-      && self.max_occurences != Some(MaxOccurences::Number { value: 1 });
+    let multiple = inheritable_multiple
+      || (self.max_occurences.is_some()
+        && self.max_occurences != Some(MaxOccurences::Number { value: 1 }));
 
     let name = if self.name.to_lowercase() == "type" {
       "kind".to_string()
@@ -124,7 +126,7 @@ impl Element {
     } else {
       name
     };
-    
+
     let attribute_name = Ident::new(&name, Span::call_site());
     let yaserde_rename = &self.name;
 

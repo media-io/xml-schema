@@ -87,8 +87,8 @@ fn choice_multiple() {
   let sample_1: Person = from_str(xml_1).unwrap();
 
   let model = Person {
-    firstname: "John".to_string(),
-    lastname: "".to_string(),
+    firstname_list: vec!["John".to_string()],
+    lastname_list: vec![],
   };
 
   assert_eq!(sample_1, model);
