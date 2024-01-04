@@ -1,4 +1,4 @@
-  use crate::xsd::{
+use crate::xsd::{
   attribute, attribute_group, complex_type, element, group, import, qualification, simple_type,
   Implementation, XsdContext,
 };

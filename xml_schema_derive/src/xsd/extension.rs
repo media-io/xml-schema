@@ -36,7 +36,7 @@ impl Implementation for Extension {
       .map(|attribute| attribute.implement(namespace_definition, prefix, context))
       .collect();
 
-let inner_attribute = if format!("{rust_type}") == "String" {
+    let inner_attribute = if format!("{rust_type}") == "String" {
       quote!(#[yaserde(text)])
     } else {
       TokenStream::new()
@@ -102,7 +102,7 @@ mod tests {
     let expected = TokenStream::from_str(
       r#"
         #[yaserde(text)]
-        pub content: String,
+        pub base: String,
       "#,
     )
     .unwrap();
@@ -145,7 +145,7 @@ mod tests {
     let expected = TokenStream::from_str(
       r#"
         #[yaserde(text)]
-        pub content: String,
+        pub base: String,
         #[yaserde(attribute)]
         pub attribute_1: String,
         #[yaserde(attribute)]

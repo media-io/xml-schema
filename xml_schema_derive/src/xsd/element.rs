@@ -123,7 +123,7 @@ impl Element {
     } else {
       name
     };
-    
+
     let attribute_name = Ident::new(&name, Span::call_site());
     let yaserde_rename = &self.name;
 
