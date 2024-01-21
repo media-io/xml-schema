@@ -31,7 +31,7 @@ impl Implementation for SimpleType {
       #namespace_definition
       pub struct #struct_name (
         #[serde(rename="$text")]
-        std::string::String
+        pub std::string::String
       );
     )
   }
