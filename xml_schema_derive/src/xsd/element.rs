@@ -140,16 +140,25 @@ impl Element {
       );
     };
 
-    let rust_type = if multiple {
-      quote!(Vec<#rust_type>)
-    } else {
-      rust_type
-    };
+    let module = (!context.is_in_sub_module()
+        && !self
+        .kind
+        .as_ref()
+        .map(|kind| {
+          RustTypesMapping::is_xs_string(context, kind)
+              || RustTypesMapping::is_xs_int(context, kind)
+        })
+        .unwrap_or_default())
+        .then_some(quote!(xml_schema_types::))
+        .unwrap_or_default();
 
-    let rust_type = if !multiple && self.min_occurences == Some(0) {
-      quote!(Option<#rust_type>)
-    } else {
-      rust_type
+    let rust_type = if multiple {
+      quote!(Vec<#module#rust_type>)
+    } else if self.min_occurences == Some(0) {
+      quote!(Option<#module#rust_type>)
+    }
+    else {
+      quote!(#module#rust_type)
     };
 
     let prefix_attribute = prefix
@@ -157,21 +166,9 @@ impl Element {
       .map(|prefix| quote!(, prefix=#prefix))
       .unwrap_or_default();
 
-    let module = (!context.is_in_sub_module()
-      && !self
-        .kind
-        .as_ref()
-        .map(|kind| {
-          RustTypesMapping::is_xs_string(context, kind)
-            || RustTypesMapping::is_xs_int(context, kind)
-        })
-        .unwrap_or_default())
-    .then_some(quote!(xml_schema_types::))
-    .unwrap_or_default();
-
     quote! {
       #[yaserde(rename=#yaserde_rename #prefix_attribute)]
-      pub #attribute_name: #module#rust_type,
+      pub #attribute_name: #rust_type,
     }
   }
 }
