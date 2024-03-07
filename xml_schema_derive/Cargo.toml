@@ -29,4 +29,4 @@ simple_logger = "4"
 syn = { version = "2.0", features = ["visit", "extra-traits"] }
 xml-rs = "0.8"
 yaserde_derive = { version = "0.9" }
-yaserde = { version = "0.9" }
+yaserde = { version = "0.10" }
