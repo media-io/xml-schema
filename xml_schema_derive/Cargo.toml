@@ -20,7 +20,7 @@ default = ["reqwest/default-tls"]
 
 [dependencies]
 darling = "0.20.3"
-heck = "0.4"
+heck = "0.5"
 log = "0.4"
 proc-macro2 = "1.0"
 quote = "1.0"
