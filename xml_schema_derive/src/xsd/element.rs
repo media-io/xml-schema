@@ -274,7 +274,7 @@ mod tests {
 
   #[test]
   fn refers_element_field_implementation() {
-    //
+    // <xs:element ref="OwnedType" />
     let element = Element {
       name: "".to_string(),
       kind: None,
@@ -294,6 +294,27 @@ mod tests {
 
     let expected = TokenStream::from_str(&format!(
       r#"#[yaserde(rename = "OwnedType")] pub owned_type : xml_schema_types :: OwnedType ,"#
+    ))
+    .unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
+
+    // <xs:element ref="OwnedType"  minOccurs="0" maxOccurs="unbounded" />
+    let element = Element {
+      name: "".to_string(),
+      kind: None,
+      refers: Some("OwnedType".to_string()),
+      min_occurences: Some(0),
+      max_occurences: Some(MaxOccurences::Unbounded),
+      complex_type: None,
+      simple_type: None,
+      annotation: None,
+    };
+
+    let implementation = element.get_field_implementation(&context, &None);
+
+    let expected = TokenStream::from_str(&format!(
+      r#"#[yaserde(rename = "OwnedType")] pub owned_type_list : Vec < xml_schema_types :: OwnedType > ,"#
     ))
     .unwrap();
 
