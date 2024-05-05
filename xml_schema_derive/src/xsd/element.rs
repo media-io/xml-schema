@@ -103,7 +103,8 @@ impl Element {
     context: &XsdContext,
     prefix: &Option<String>,
   ) -> TokenStream {
-    if self.name.is_empty() {
+    if self.name.is_empty() && (self.refers.is_none() || matches!(self.refers.as_deref(), Some("")))
+    {
       return quote!();
     }
 
@@ -112,8 +113,14 @@ impl Element {
 
     let name = if self.name.to_lowercase() == "type" {
       "kind".to_string()
-    } else {
+    } else if !self.name.is_empty() {
       self.name.to_snake_case()
+    } else {
+      self
+        .refers
+        .as_ref()
+        .expect("[Element] refers should be defined")
+        .to_snake_case()
     };
 
     log::info!("Generate element {:?}", name);
@@ -125,7 +132,14 @@ impl Element {
     };
 
     let attribute_name = Ident::new(&name, Span::call_site());
-    let yaserde_rename = &self.name;
+    let yaserde_rename = if !self.name.is_empty() {
+      &self.name
+    } else {
+      &self
+        .refers
+        .as_ref()
+        .expect("[Element] refers should be defined")
+    };
 
     let rust_type = if let Some(complex_type) = &self.complex_type {
       complex_type.get_integrated_implementation(&self.name)
@@ -133,6 +147,8 @@ impl Element {
       simple_type.get_type_implementation(context, &Some(self.name.to_owned()))
     } else if let Some(kind) = &self.kind {
       RustTypesMapping::get(context, kind)
+    } else if let Some(refers) = &self.refers {
+      RustTypesMapping::get(context, refers)
     } else {
       panic!(
         "[Element] {:?} unimplemented type: {:?}",
@@ -250,6 +266,34 @@ mod tests {
           #[yaserde(text)]
           pub content: xml_schema_types::String,
         }}"#
+    ))
+    .unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
+  }
+
+  #[test]
+  fn refers_element_field_implementation() {
+    //
+    let element = Element {
+      name: "".to_string(),
+      kind: None,
+      refers: Some("OwnedType".to_string()),
+      min_occurences: None,
+      max_occurences: None,
+      complex_type: None,
+      simple_type: None,
+      annotation: None,
+    };
+
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
+
+    let implementation = element.get_field_implementation(&context, &None);
+
+    let expected = TokenStream::from_str(&format!(
+      r#"#[yaserde(rename = "OwnedType")] pub owned_type : xml_schema_types :: OwnedType ,"#
     ))
     .unwrap();
 
