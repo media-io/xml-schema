@@ -135,7 +135,7 @@ impl Element {
     let yaserde_rename = if !self.name.is_empty() {
       &self.name
     } else {
-      &self
+      self
         .refers
         .as_ref()
         .expect("[Element] refers should be defined")
