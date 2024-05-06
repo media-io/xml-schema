@@ -297,9 +297,9 @@ mod tests {
 
     let implementation = element.get_field_implementation(&context, &None);
 
-    let expected = TokenStream::from_str(&format!(
-      r#"#[yaserde(rename = "OwnedType")] pub owned_type : xml_schema_types :: OwnedType ,"#
-    ))
+    let expected = TokenStream::from_str(
+      r#"#[yaserde(rename = "OwnedType")] pub owned_type : xml_schema_types :: OwnedType ,"#,
+    )
     .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
@@ -318,9 +318,9 @@ mod tests {
 
     let implementation = element.get_field_implementation(&context, &None);
 
-    let expected = TokenStream::from_str(&format!(
+    let expected = TokenStream::from_str(
       r#"#[yaserde(rename = "OwnedType")] pub owned_type_list : Vec < xml_schema_types :: OwnedType > ,"#
-    ))
+    )
     .unwrap();
 
     assert_eq!(implementation.to_string(), expected.to_string());
