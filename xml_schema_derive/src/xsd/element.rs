@@ -103,8 +103,8 @@ impl Element {
     context: &XsdContext,
     prefix: &Option<String>,
   ) -> TokenStream {
-    if self.name.is_empty() && (self.refers.is_none() || matches!(self.refers.as_deref(), Some("")))
-    {
+    let refers = self.get_refers();
+    if self.name.is_empty() && refers.is_none() {
       return quote!();
     }
 
@@ -116,9 +116,7 @@ impl Element {
     } else if !self.name.is_empty() {
       self.name.to_snake_case()
     } else {
-      self
-        .refers
-        .as_ref()
+      refers
         .expect("[Element] refers should be defined")
         .to_snake_case()
     };
@@ -135,10 +133,7 @@ impl Element {
     let yaserde_rename = if !self.name.is_empty() {
       &self.name
     } else {
-      self
-        .refers
-        .as_ref()
-        .expect("[Element] refers should be defined")
+      refers.expect("[Element] refers should be defined")
     };
 
     let rust_type = if let Some(complex_type) = &self.complex_type {
@@ -147,7 +142,7 @@ impl Element {
       simple_type.get_type_implementation(context, &Some(self.name.to_owned()))
     } else if let Some(kind) = &self.kind {
       RustTypesMapping::get(context, kind)
-    } else if let Some(refers) = &self.refers {
+    } else if let Some(refers) = refers {
       RustTypesMapping::get(context, refers)
     } else {
       panic!(
@@ -185,6 +180,16 @@ impl Element {
       #[yaserde(rename=#yaserde_rename #prefix_attribute)]
       pub #attribute_name: #rust_type,
     }
+  }
+
+  fn get_refers(&self) -> Option<&str> {
+    self.refers.as_ref().and_then(|refers| {
+      if refers.is_empty() {
+        None
+      } else {
+        Some(refers.as_str())
+      }
+    })
   }
 }
 
