@@ -14,9 +14,9 @@ pub struct Schema {
   #[yaserde(rename = "targetNamespace", attribute)]
   pub target_namespace: Option<String>,
   #[yaserde(rename = "elementFormDefault", attribute)]
-  pub element_form_default: qualification::Qualification,
+  pub element_form_default: Option<qualification::Qualification>,
   #[yaserde(rename = "attributeFormDefault", attribute)]
-  pub attribute_form_default: qualification::Qualification,
+  pub attribute_form_default: Option<qualification::Qualification>,
   #[yaserde(rename = "import")]
   pub imports: Vec<import::Import>,
   #[yaserde(rename = "element")]
