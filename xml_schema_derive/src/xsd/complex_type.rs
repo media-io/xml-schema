@@ -58,7 +58,7 @@ impl Implementation for ComplexType {
         let complex_content_type = complex_content.get_field_implementation(context, prefix);
         quote!(
           #[yaserde(flatten)]
-          #complex_content_type,
+          #complex_content_type
         )
       })
       .unwrap_or_default();

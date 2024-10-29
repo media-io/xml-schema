@@ -42,10 +42,17 @@ impl Implementation for Extension {
       TokenStream::new()
     };
 
+    let sequences: TokenStream = self
+      .sequences
+      .iter()
+      .map(|sequence| sequence.implement(namespace_definition, prefix, context))
+      .collect();
+
     quote!(
       #inner_attribute
       pub base: #rust_type,
       #attributes
+      #sequences
     )
   }
 }
@@ -65,16 +72,22 @@ impl Extension {
         let group_type = group.get_type_implementation(context, prefix);
 
         quote!(
-          ,
           #[serde(flatten)]
-          pub extension : #group_type
+          pub extension : #group_type,
         )
       })
       .unwrap_or_default();
 
+    let sequences: TokenStream = self
+      .sequences
+      .iter()
+      .map(|sequence| sequence.get_field_implementation(context, prefix))
+      .collect();
+
     quote!(
-      pub base : #rust_type
+      pub base : #rust_type,
       #group_content
+      #sequences
     )
   }
 }
@@ -151,6 +164,104 @@ mod tests {
         #[yaserde(attribute)]
         pub attribute_2: Option<bool> ,
       "#,
+    )
+    .unwrap();
+
+    assert_eq!(implementation.to_string(), expected.to_string());
+  }
+
+  #[test]
+  fn extension_with_sequences() {
+    use crate::xsd::complex_content::ComplexContent;
+    use crate::xsd::complex_type::ComplexType;
+    use crate::xsd::element::Element;
+
+    /*
+    <xs:complexType name="fullpersoninfo">
+      <xs:complexContent>
+        <xs:extension base="personinfo">
+          <xs:sequence>
+            <xs:element name="address" type="xs:string"/>
+            <xs:element name="city" type="xs:string"/>
+            <xs:element name="country" type="xs:string"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+    */
+
+    let extension = Extension {
+      base: "personinfo".to_string(),
+      attributes: vec![],
+      sequences: vec![Sequence {
+        elements: vec![
+          Element {
+            name: "address".to_string(),
+            kind: Some("xs:string".to_string()),
+            refers: None,
+            min_occurences: None,
+            max_occurences: None,
+            complex_type: None,
+            simple_type: None,
+            annotation: None,
+          },
+          Element {
+            name: "city".to_string(),
+            kind: Some("xs:string".to_string()),
+            refers: None,
+            min_occurences: None,
+            max_occurences: None,
+            complex_type: None,
+            simple_type: None,
+            annotation: None,
+          },
+          Element {
+            name: "country".to_string(),
+            kind: Some("xs:string".to_string()),
+            refers: None,
+            min_occurences: None,
+            max_occurences: None,
+            complex_type: None,
+            simple_type: None,
+            annotation: None,
+          },
+        ],
+      }],
+      group: None,
+    };
+
+    let st = ComplexType {
+      name: "fullpersoninfo".to_string(),
+      annotation: None,
+      attributes: vec![],
+      sequence: None,
+      simple_content: None,
+      complex_content: Some(ComplexContent {
+        extension: Some(extension),
+      }),
+    };
+
+    let context =
+      XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
+        .unwrap();
+
+    //let implementation = extension.implement(&TokenStream::new(), &None, &context);
+    let implementation = st.implement(&TokenStream::new(), &None, &context);
+
+    let expected = TokenStream::from_str(
+      "
+        # [derive (Clone , Debug , Default , PartialEq , yaserde_derive :: YaDeserialize , yaserde_derive :: YaSerialize)]
+        pub struct Fullpersoninfo {
+          # [yaserde (flatten)]
+          pub base : Personinfo ,
+          # [yaserde (rename = \"address\")]
+          pub address : String ,
+          # [yaserde (rename = \"city\")]
+          pub city : String ,
+          # [yaserde (rename = \"country\")]
+          pub country : String ,
+        }
+      ",
     )
     .unwrap();
 
