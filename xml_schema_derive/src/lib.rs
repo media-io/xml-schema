@@ -1,7 +1,7 @@
 extern crate proc_macro;
 #[macro_use]
 extern crate quote;
-#[macro_use]
+
 extern crate yaserde_derive;
 
 use crate::attribute::XmlSchemaAttributes;

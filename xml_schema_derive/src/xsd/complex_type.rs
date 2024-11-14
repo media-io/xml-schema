@@ -1,30 +1,9 @@
-use crate::xsd::{
-  annotation::Annotation, attribute::Attribute, complex_content::ComplexContent,
-  sequence::Sequence, simple_content::SimpleContent, Implementation, XsdContext,
-};
+use crate::xsd::{Implementation, XsdContext};
 use heck::ToUpperCamelCase;
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(
-  rename = "complexType"
-  prefix = "xs",
-  namespace = "xs: http://www.w3.org/2001/XMLSchema"
-)]
-pub struct ComplexType {
-  #[yaserde(attribute)]
-  pub name: String,
-  #[yaserde(rename = "attribute")]
-  pub attributes: Vec<Attribute>,
-  pub sequence: Option<Sequence>,
-  #[yaserde(rename = "simpleContent")]
-  pub simple_content: Option<SimpleContent>,
-  #[yaserde(rename = "complexContent")]
-  pub complex_content: Option<ComplexContent>,
-  #[yaserde(rename = "annotation")]
-  pub annotation: Option<Annotation>,
-}
+use xml_schema::ComplexType;
 
 impl Implementation for ComplexType {
   fn implement(
@@ -96,14 +75,8 @@ impl Implementation for ComplexType {
       #sub_types_implementation
     }
   }
-}
 
-impl ComplexType {
-  pub fn get_field_implementation(
-    &self,
-    context: &XsdContext,
-    prefix: &Option<String>,
-  ) -> TokenStream {
+  fn get_field_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
     if self.sequence.is_some() {
       self
         .sequence
@@ -119,7 +92,7 @@ impl ComplexType {
     }
   }
 
-  pub fn get_integrated_implementation(&self, parent_name: &str) -> TokenStream {
+  fn get_integrated_implementation(&self, parent_name: &str) -> TokenStream {
     if self.simple_content.is_some() {
       return quote!(String);
     }

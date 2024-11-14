@@ -1,25 +1,7 @@
-use crate::xsd::{
-  attribute::Attribute, group::Group, rust_types_mapping::RustTypesMapping, sequence::Sequence,
-  Implementation, XsdContext,
-};
+use crate::xsd::{rust_types_mapping::RustTypesMapping, Implementation, XsdContext};
 use proc_macro2::TokenStream;
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(
-  root = "extension",
-  prefix = "xs",
-  namespace = "xs: http://www.w3.org/2001/XMLSchema"
-)]
-pub struct Extension {
-  #[yaserde(attribute)]
-  pub base: String,
-  #[yaserde(rename = "attribute")]
-  pub attributes: Vec<Attribute>,
-  #[yaserde(rename = "sequence")]
-  pub sequences: Vec<Sequence>,
-  #[yaserde(rename = "group")]
-  pub group: Option<Group>,
-}
+use xml_schema::Extension;
 
 impl Implementation for Extension {
   fn implement(
@@ -48,14 +30,8 @@ impl Implementation for Extension {
       #attributes
     )
   }
-}
 
-impl Extension {
-  pub fn get_field_implementation(
-    &self,
-    context: &XsdContext,
-    prefix: &Option<String>,
-  ) -> TokenStream {
+  fn get_field_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
     let rust_type = RustTypesMapping::get(context, &self.base);
 
     let group_content = self
@@ -112,7 +88,7 @@ mod tests {
 
   #[test]
   fn extension_with_attributes() {
-    use crate::xsd::attribute::Required;
+    use xml_schema::{Attribute, Required};
 
     let st = Extension {
       base: "xs:string".to_string(),
