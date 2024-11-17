@@ -37,7 +37,7 @@ impl Implementation for Element {
       let fields_definition = self
         .complex_type
         .iter()
-        .map(|complex_type| complex_type.get_field_implementation(context, prefix))
+        .map(|complex_type| complex_type.get_field_implementation(prefix, context))
         .collect();
 
       (fields_definition, quote!())
@@ -74,7 +74,7 @@ impl Implementation for Element {
     self.implement(namespace_definition, prefix, context)
   }
 
-  fn get_field_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
+  fn get_field_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     let refers = self.get_refers();
     if self.name.is_empty() && refers.is_none() {
       return quote!();
@@ -111,7 +111,7 @@ impl Implementation for Element {
     let rust_type = if let Some(complex_type) = &self.complex_type {
       complex_type.get_integrated_implementation(&self.name)
     } else if let Some(simple_type) = &self.simple_type {
-      simple_type.get_type_implementation(context, &Some(self.name.to_owned()))
+      simple_type.get_type_implementation(&Some(self.name.to_owned()), context)
     } else if let Some(kind) = &self.kind {
       RustTypesMapping::get(context, kind)
     } else if let Some(refers) = refers {
@@ -259,7 +259,7 @@ mod tests {
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let implementation = element.get_field_implementation(&context, &None);
+    let implementation = element.get_field_implementation(&None, &context);
 
     let expected = TokenStream::from_str(
       r#"#[yaserde(rename = "OwnedType")] pub owned_type : xml_schema_types :: OwnedType ,"#,
@@ -280,7 +280,7 @@ mod tests {
       annotation: None,
     };
 
-    let implementation = element.get_field_implementation(&context, &None);
+    let implementation = element.get_field_implementation(&None, &context);
 
     let expected = TokenStream::from_str(
       r#"#[yaserde(rename = "OwnedType")] pub owned_type_list : Vec < xml_schema_types :: OwnedType > ,"#

@@ -2,7 +2,6 @@ use xml_schema_derive::XmlSchema;
 use yaserde::de::from_str;
 use yaserde::ser::to_string;
 
-
 #[test]
 fn simple_type_string() {
   #[derive(Debug, XmlSchema)]

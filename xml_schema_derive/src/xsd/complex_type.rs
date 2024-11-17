@@ -34,7 +34,7 @@ impl Implementation for ComplexType {
       .complex_content
       .as_ref()
       .map(|complex_content| {
-        let complex_content_type = complex_content.get_field_implementation(context, prefix);
+        let complex_content_type = complex_content.get_field_implementation(prefix, context);
         quote!(
           #[yaserde(flatten)]
           #complex_content_type,
@@ -51,7 +51,7 @@ impl Implementation for ComplexType {
     let sub_types_implementation = self
       .sequence
       .as_ref()
-      .map(|sequence| sequence.get_sub_types_implementation(context, namespace_definition, prefix))
+      .map(|sequence| sequence.get_sub_types_implementation(namespace_definition, prefix, context))
       .unwrap_or_default();
 
     let docs = self
@@ -76,18 +76,18 @@ impl Implementation for ComplexType {
     }
   }
 
-  fn get_field_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
+  fn get_field_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     if self.sequence.is_some() {
       self
         .sequence
         .as_ref()
-        .map(|sequence| sequence.get_field_implementation(context, prefix))
+        .map(|sequence| sequence.get_field_implementation(prefix, context))
         .unwrap_or_default()
     } else {
       self
         .simple_content
         .as_ref()
-        .map(|simple_content| simple_content.get_field_implementation(context, prefix))
+        .map(|simple_content| simple_content.get_field_implementation(prefix, context))
         .unwrap_or_default()
     }
   }

@@ -31,14 +31,14 @@ impl Implementation for Extension {
     )
   }
 
-  fn get_field_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
+  fn get_field_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     let rust_type = RustTypesMapping::get(context, &self.base);
 
     let group_content = self
       .group
       .as_ref()
       .map(|group| {
-        let group_type = group.get_type_implementation(context, prefix);
+        let group_type = group.get_type_implementation(prefix, context);
 
         quote!(
           ,

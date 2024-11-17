@@ -28,9 +28,9 @@ impl Implementation for SimpleType {
     )
   }
 
-  fn get_type_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
+  fn get_type_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     if let Some(restriction) = &self.restriction {
-      restriction.get_type_implementation(context, prefix)
+      restriction.get_type_implementation(prefix, context)
     } else {
       panic!("No restriction for this simple type {:?}", self);
     }

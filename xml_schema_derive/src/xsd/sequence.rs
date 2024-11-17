@@ -15,15 +15,15 @@ impl Implementation for Sequence {
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix))
+      .map(|element| element.get_field_implementation(prefix, context))
       .collect()
   }
 
   fn get_sub_types_implementation(
     &self,
-    context: &XsdContext,
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
+    context: &XsdContext,
   ) -> TokenStream {
     info!("Generate sub types implementation");
     self
@@ -33,11 +33,11 @@ impl Implementation for Sequence {
       .collect()
   }
 
-  fn get_field_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
+  fn get_field_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix))
+      .map(|element| element.get_field_implementation(prefix, context))
       .collect()
   }
 }

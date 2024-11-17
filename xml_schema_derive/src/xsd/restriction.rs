@@ -5,7 +5,7 @@ use crate::xsd::Implementation;
 use xml_schema::Restriction;
 
 impl Implementation for Restriction {
-  fn get_type_implementation(&self, context: &XsdContext, _prefix: &Option<String>) -> TokenStream {
+  fn get_type_implementation(&self, _prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     if let Some(base) = &self.base {
       RustTypesMapping::get(context, base)
     } else {

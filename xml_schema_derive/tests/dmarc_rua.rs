@@ -4,7 +4,10 @@ use yaserde::de::from_str;
 #[test]
 fn dmarc_rua_string() {
   #[derive(Debug, XmlSchema)]
-  #[xml_schema(source = "xml_schema_derive/tests/dmarc_rua.xsd", target_prefix = "dmarc")]
+  #[xml_schema(
+    source = "xml_schema_derive/tests/dmarc_rua.xsd",
+    target_prefix = "dmarc"
+  )]
   struct DmarcRuaSchema;
 
   let xml_1 = r#"<?xml version="1.0" encoding="UTF-8" ?>

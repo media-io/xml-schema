@@ -22,7 +22,7 @@ impl Implementation for Group {
     let fields = self
       .sequence
       .as_ref()
-      .map(|sequence| sequence.get_field_implementation(context, prefix))
+      .map(|sequence| sequence.get_field_implementation(prefix, context))
       .unwrap_or_default();
 
     quote!(
@@ -34,7 +34,7 @@ impl Implementation for Group {
     )
   }
 
-  fn get_type_implementation(&self, context: &XsdContext, _prefix: &Option<String>) -> TokenStream {
+  fn get_type_implementation(&self, _prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     if let Some(reference) = &self.reference {
       RustTypesMapping::get(context, reference)
     } else {
@@ -84,7 +84,7 @@ pub struct Groupthing { \
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let type_implementation = format!("{}", group.get_type_implementation(&context, &None));
+    let type_implementation = format!("{}", group.get_type_implementation(&None, &context));
 
     assert_eq!(type_implementation, "Groupthing");
   }

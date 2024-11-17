@@ -15,7 +15,7 @@ impl Implementation for SimpleContent {
       .implement(namespace_definition, prefix, context)
   }
 
-  fn get_field_implementation(&self, context: &XsdContext, prefix: &Option<String>) -> TokenStream {
-    self.extension.get_field_implementation(context, prefix)
+  fn get_field_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
+    self.extension.get_field_implementation(prefix, context)
   }
 }

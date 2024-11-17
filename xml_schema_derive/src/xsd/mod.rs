@@ -41,8 +41,8 @@ trait Implementation {
 
   fn get_type_implementation(
     &self,
-    _context: &XsdContext,
     _prefix: &Option<String>,
+    _context: &XsdContext,
   ) -> TokenStream {
     unimplemented!()
   }
@@ -58,17 +58,17 @@ trait Implementation {
 
   fn get_sub_types_implementation(
     &self,
-    _context: &XsdContext,
     _namespace_definition: &TokenStream,
     _prefix: &Option<String>,
+    _context: &XsdContext,
   ) -> TokenStream {
     unimplemented!()
   }
 
   fn get_field_implementation(
     &self,
-    _context: &XsdContext,
     _prefix: &Option<String>,
+    _context: &XsdContext,
   ) -> TokenStream {
     unimplemented!()
   }
