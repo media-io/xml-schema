@@ -1,13 +1,8 @@
-use crate::xsd::{element::Element, Implementation, XsdContext};
+use crate::xsd::{Implementation, XsdContext};
 use log::info;
 use proc_macro2::TokenStream;
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
-pub struct Sequence {
-  #[yaserde(rename = "element")]
-  pub elements: Vec<Element>,
-}
+use xml_schema::Sequence;
 
 impl Implementation for Sequence {
   fn implement(
@@ -20,17 +15,15 @@ impl Implementation for Sequence {
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix))
+      .map(|element| element.get_field_implementation(prefix, context))
       .collect()
   }
-}
 
-impl Sequence {
-  pub fn get_sub_types_implementation(
+  fn get_sub_types_implementation(
     &self,
-    context: &XsdContext,
     namespace_definition: &TokenStream,
     prefix: &Option<String>,
+    context: &XsdContext,
   ) -> TokenStream {
     info!("Generate sub types implementation");
     self
@@ -40,15 +33,11 @@ impl Sequence {
       .collect()
   }
 
-  pub fn get_field_implementation(
-    &self,
-    context: &XsdContext,
-    prefix: &Option<String>,
-  ) -> TokenStream {
+  fn get_field_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     self
       .elements
       .iter()
-      .map(|element| element.get_field_implementation(context, prefix))
+      .map(|element| element.get_field_implementation(prefix, context))
       .collect()
   }
 }

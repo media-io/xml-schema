@@ -1,20 +1,9 @@
-use crate::xsd::{
-  rust_types_mapping::RustTypesMapping, sequence::Sequence, Implementation, XsdContext,
-};
+use crate::xsd::{rust_types_mapping::RustTypesMapping, Implementation, XsdContext};
 use heck::ToUpperCamelCase;
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
-pub struct Group {
-  #[yaserde(attribute)]
-  pub name: Option<String>,
-  #[yaserde(attribute, rename = "ref")]
-  pub reference: Option<String>,
-  #[yaserde()]
-  pub sequence: Option<Sequence>,
-}
+use xml_schema::Group;
 
 impl Implementation for Group {
   fn implement(
@@ -33,7 +22,7 @@ impl Implementation for Group {
     let fields = self
       .sequence
       .as_ref()
-      .map(|sequence| sequence.get_field_implementation(context, prefix))
+      .map(|sequence| sequence.get_field_implementation(prefix, context))
       .unwrap_or_default();
 
     quote!(
@@ -44,14 +33,8 @@ impl Implementation for Group {
       }
     )
   }
-}
 
-impl Group {
-  pub fn get_type_implementation(
-    &self,
-    context: &XsdContext,
-    _prefix: &Option<String>,
-  ) -> TokenStream {
+  fn get_type_implementation(&self, _prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     if let Some(reference) = &self.reference {
       RustTypesMapping::get(context, reference)
     } else {
@@ -101,7 +84,7 @@ pub struct Groupthing { \
       XsdContext::new(r#"<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"></xs:schema>"#)
         .unwrap();
 
-    let type_implementation = format!("{}", group.get_type_implementation(&context, &None));
+    let type_implementation = format!("{}", group.get_type_implementation(&None, &context));
 
     assert_eq!(type_implementation, "Groupthing");
   }

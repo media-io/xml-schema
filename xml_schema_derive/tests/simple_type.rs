@@ -6,7 +6,7 @@ use yaserde::ser::to_string;
 fn simple_type_string() {
   #[derive(Debug, XmlSchema)]
   #[xml_schema(
-    source = "xml_schema/tests/simple_type_string.xsd",
+    source = "xml_schema_derive/tests/simple_type_string.xsd",
     target_prefix = "st"
   )]
   struct SimpleTypeSchema;
@@ -29,7 +29,7 @@ fn simple_type_string() {
 #[test]
 fn simple_type_list() {
   #[derive(Debug, XmlSchema)]
-  #[xml_schema(source = "xml_schema/tests/simple_type_list.xsd")]
+  #[xml_schema(source = "xml_schema_derive/tests/simple_type_list.xsd")]
   struct SimpleTypeSchema;
 
   let xml_1 = r#"

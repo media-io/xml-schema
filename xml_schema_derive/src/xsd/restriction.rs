@@ -1,19 +1,11 @@
 use crate::xsd::{rust_types_mapping::RustTypesMapping, XsdContext};
 use proc_macro2::TokenStream;
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
-pub struct Restriction {
-  #[yaserde(rename = "base", attribute)]
-  pub base: Option<String>,
-}
+use crate::xsd::Implementation;
+use xml_schema::Restriction;
 
-impl Restriction {
-  pub fn get_type_implementation(
-    &self,
-    context: &XsdContext,
-    _prefix: &Option<String>,
-  ) -> TokenStream {
+impl Implementation for Restriction {
+  fn get_type_implementation(&self, _prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     if let Some(base) = &self.base {
       RustTypesMapping::get(context, base)
     } else {

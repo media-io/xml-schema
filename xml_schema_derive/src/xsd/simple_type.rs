@@ -1,17 +1,9 @@
-use crate::xsd::{list::List, restriction::Restriction, union::Union, Implementation, XsdContext};
+use crate::xsd::{Implementation, XsdContext};
 use heck::ToUpperCamelCase;
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
-pub struct SimpleType {
-  #[yaserde(attribute)]
-  pub name: String,
-  pub restriction: Option<Restriction>,
-  pub list: Option<List>,
-  pub union: Option<Union>,
-}
+use xml_schema::SimpleType;
 
 impl Implementation for SimpleType {
   fn implement(
@@ -35,16 +27,10 @@ impl Implementation for SimpleType {
       }
     )
   }
-}
 
-impl SimpleType {
-  pub fn get_type_implementation(
-    &self,
-    context: &XsdContext,
-    prefix: &Option<String>,
-  ) -> TokenStream {
+  fn get_type_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     if let Some(restriction) = &self.restriction {
-      restriction.get_type_implementation(context, prefix)
+      restriction.get_type_implementation(prefix, context)
     } else {
       panic!("No restriction for this simple type {:?}", self);
     }

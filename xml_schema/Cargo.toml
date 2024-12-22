@@ -13,11 +13,10 @@ readme = "../README.md"
 exclude = ["/tests"]
 
 [dependencies]
-xml-schema-derive = { version = "0.3.0", path = "../xml_schema_derive", optional = true }
-
-[dev-dependencies]
-log = "0.4"
 xml-rs = "0.8"
-xml-schema-derive = { version = "0.3.0", path = "../xml_schema_derive" }
 yaserde_derive = { version = "0.9" }
 yaserde = { version = "0.9" }
+log = "0.4"
+reqwest = { version = "0.11", default-features = false, features = ["blocking"] }
+
+[dev-dependencies]

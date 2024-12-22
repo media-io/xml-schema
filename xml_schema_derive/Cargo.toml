@@ -19,6 +19,7 @@ proc-macro = true
 default = ["reqwest/default-tls"]
 
 [dependencies]
+xml-schema = { path = "../xml_schema"}
 darling = "0.20.3"
 heck = "0.4"
 log = "0.4"

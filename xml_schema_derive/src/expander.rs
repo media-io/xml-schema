@@ -1,6 +1,8 @@
-use crate::{attribute::XmlSchemaAttributes, xsd::Xsd};
+use crate::{attribute::XmlSchemaAttributes, xsd::implement_xsd};
 use proc_macro2::TokenStream;
 use syn::{token::Pub, Visibility};
+
+use xml_schema::Xsd;
 
 pub fn expand_derive(attributes: &XmlSchemaAttributes) -> Result<TokenStream, String> {
   let _ = simple_logger::init_with_level(attributes.log_level());
@@ -10,11 +12,10 @@ pub fn expand_derive(attributes: &XmlSchemaAttributes) -> Result<TokenStream, St
 
   let xsd = Xsd::new_from_file(
     attributes.module_name(),
-    vis,
     &attributes.source,
     &attributes.module_namespace_mappings(),
   )?;
-  let generated = xsd.implement(&attributes.target_prefix);
+  let generated = implement_xsd(&xsd, vis, &attributes.target_prefix);
 
   if let Some(store_generated_code) = &attributes.store_generated_code {
     std::fs::write(store_generated_code, generated.to_string()).map_err(|e| e.to_string())?;

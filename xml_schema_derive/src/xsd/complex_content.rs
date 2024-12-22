@@ -1,22 +1,14 @@
-use crate::xsd::{extension::Extension, xsd_context::XsdContext};
+use crate::xsd::Implementation;
 use proc_macro2::TokenStream;
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(prefix = "xs", namespace = "xs: http://www.w3.org/2001/XMLSchema")]
-pub struct ComplexContent {
-  pub extension: Option<Extension>,
-}
+use xml_schema::{ComplexContent, XsdContext};
 
-impl ComplexContent {
-  pub fn get_field_implementation(
-    &self,
-    context: &XsdContext,
-    prefix: &Option<String>,
-  ) -> TokenStream {
+impl Implementation for ComplexContent {
+  fn get_field_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     self
       .extension
       .as_ref()
       .unwrap()
-      .get_field_implementation(context, prefix)
+      .get_field_implementation(prefix, context)
   }
 }

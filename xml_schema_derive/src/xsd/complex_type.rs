@@ -1,30 +1,9 @@
-use crate::xsd::{
-  annotation::Annotation, attribute::Attribute, complex_content::ComplexContent,
-  sequence::Sequence, simple_content::SimpleContent, Implementation, XsdContext,
-};
+use crate::xsd::{Implementation, XsdContext};
 use heck::ToUpperCamelCase;
 use proc_macro2::{Span, TokenStream};
 use syn::Ident;
 
-#[derive(Clone, Default, Debug, PartialEq, YaDeserialize)]
-#[yaserde(
-  rename = "complexType"
-  prefix = "xs",
-  namespace = "xs: http://www.w3.org/2001/XMLSchema"
-)]
-pub struct ComplexType {
-  #[yaserde(attribute)]
-  pub name: String,
-  #[yaserde(rename = "attribute")]
-  pub attributes: Vec<Attribute>,
-  pub sequence: Option<Sequence>,
-  #[yaserde(rename = "simpleContent")]
-  pub simple_content: Option<SimpleContent>,
-  #[yaserde(rename = "complexContent")]
-  pub complex_content: Option<ComplexContent>,
-  #[yaserde(rename = "annotation")]
-  pub annotation: Option<Annotation>,
-}
+use xml_schema::ComplexType;
 
 impl Implementation for ComplexType {
   fn implement(
@@ -55,7 +34,7 @@ impl Implementation for ComplexType {
       .complex_content
       .as_ref()
       .map(|complex_content| {
-        let complex_content_type = complex_content.get_field_implementation(context, prefix);
+        let complex_content_type = complex_content.get_field_implementation(prefix, context);
         quote!(
           #[yaserde(flatten)]
           #complex_content_type,
@@ -72,7 +51,7 @@ impl Implementation for ComplexType {
     let sub_types_implementation = self
       .sequence
       .as_ref()
-      .map(|sequence| sequence.get_sub_types_implementation(context, namespace_definition, prefix))
+      .map(|sequence| sequence.get_sub_types_implementation(namespace_definition, prefix, context))
       .unwrap_or_default();
 
     let docs = self
@@ -96,30 +75,24 @@ impl Implementation for ComplexType {
       #sub_types_implementation
     }
   }
-}
 
-impl ComplexType {
-  pub fn get_field_implementation(
-    &self,
-    context: &XsdContext,
-    prefix: &Option<String>,
-  ) -> TokenStream {
+  fn get_field_implementation(&self, prefix: &Option<String>, context: &XsdContext) -> TokenStream {
     if self.sequence.is_some() {
       self
         .sequence
         .as_ref()
-        .map(|sequence| sequence.get_field_implementation(context, prefix))
+        .map(|sequence| sequence.get_field_implementation(prefix, context))
         .unwrap_or_default()
     } else {
       self
         .simple_content
         .as_ref()
-        .map(|simple_content| simple_content.get_field_implementation(context, prefix))
+        .map(|simple_content| simple_content.get_field_implementation(prefix, context))
         .unwrap_or_default()
     }
   }
 
-  pub fn get_integrated_implementation(&self, parent_name: &str) -> TokenStream {
+  fn get_integrated_implementation(&self, parent_name: &str) -> TokenStream {
     if self.simple_content.is_some() {
       return quote!(String);
     }

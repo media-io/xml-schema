@@ -1,4 +1,5 @@
-#[cfg(feature = "xml_schema_derive")]
-#[allow(unused_imports)]
 #[macro_use]
-extern crate xml_schema_derive;
+extern crate yaserde_derive;
+
+mod xsd;
+pub use xsd::*;
