@@ -37,7 +37,7 @@ impl Implementation for Group {
       .unwrap_or_default();
 
     quote!(
-      #[derive(Clone, Debug, Default, PartialEq, serde::Deserialize, serde::Serialize)]
+      #[derive(Clone, Debug, Default, PartialEq, yaserde_derive::YaDeserialize, yaserde_derive::YaSerialize)]
       #namespace_definition
       pub struct #struct_name {
         #fields
